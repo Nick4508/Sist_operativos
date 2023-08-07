@@ -1,0 +1,13 @@
+all: main
+
+main: main.o funciones.o
+	gcc main.o funciones.o -o main -Wall
+
+main.o: main.c funciones.h
+	gcc -c main.c
+
+funciones.o: funciones.c funciones.h
+	gcc -c funciones.c
+
+clean: 
+	rm -f main *.o
