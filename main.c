@@ -22,49 +22,63 @@ int main(){
             strncpy(nombre_archivo,entrada->d_name,longitud-4);
             nombre_archivo[longitud-4]='\0';
             FILE *archivo;
-            char letras[401],orientacion[15];
+            char letras[402],orientacion[15];
             archivo = fopen(entrada->d_name,"r");
             if(archivo == NULL ){
                 printf("Error");
             }else{
                 // printf("palabra :%s\n",nombre_archivo);
-                printf("primera linea:");
                 fgets(orientacion,15,archivo);
-                printf("%s",orientacion);
-                // printf("segunda linea:");
-                fgets(letras,401,archivo);
-                // printf("%s\n",letras);
-                int largo,largo_spaceless = 0,n=0,fila = 1;
-                largo = strlen(letras);
-                n = (largo-1)/2;
-                char **matriz = (char**)malloc(n*sizeof(char*));
-                // printf("largo :%d\n",largo);
-                // printf("largo :%d\n",n);
-                char *sin_espacios;
+                strtok(orientacion,"\n");
+
+                // printf("%s\n",orientacion);
+
+                fgets(letras,402,archivo);
                 strtok(letras,"\n");
+
+                int largo,n=0,fila = 1;
+                largo = strlen(letras);
+                n = (largo)/2;
+                char **matriz = (char**)malloc(n*sizeof(char*));
+                char *sin_espacios;
+                
 
                 sin_espacios = eliminarEspacios(letras,largo);
                 matriz[0] = sin_espacios;
-                largo_spaceless = strlen(sin_espacios);
-                while(fgets(letras,401,archivo)!=NULL && fila <n){
+
+
+                while(fgets(letras,402,archivo)!=NULL && fila <=n){
                     strtok(letras,"\n");
+                    largo = strlen(letras);
                     sin_espacios = eliminarEspacios(letras,largo);
+                    strtok(sin_espacios,"\n");
                     matriz[fila]= sin_espacios;
                     fila++;
                 }
-                printf("matriz :\n");
-                for(int i = 0;i<n;i++){
-                    printf("%s\n",matriz[i]);
+                char cmp[12] = "vertical";
+                char cmp2[12] = "Vertical";
+
+                char try[12];
+                strncpy(try,orientacion,sizeof(cmp));
+                try[sizeof(try)-1] = '\0';
+                printf("%s\n",orientacion);
+                
+                if(try[0] == 'v' || try[0] == 'V'){
+                    printf("-Vertical\n");
+                }else{
+                    printf("-horizontal\n");
                 }
 
+                // printf("Matriz de %dX%d\n",n,n);
+                // for(int i = 0;i < n;i++){
+                //     printf("%s\n",matriz[i]);
+                // }
 
                 for(int i = 0;i<n;i++){
                     free(matriz[i]);
                 }
                 free(matriz);
-                // printf("%s\n",sin_espacios);
-
-                // printf("Largo sin espacios: %d\n",largo_spaceless);
+               
             }
             fclose(archivo);
 
@@ -74,29 +88,7 @@ int main(){
     }
 
     closedir(directorio);
-    // FILE *archivo;
-    // char letras[201];
-
-    // archivo = fopen("casa.txt","r");
-
-    // if(archivo == NULL ){
-    //     printf("Error");
-    // }else{
-    //     printf("primera linea:\n");
-    //     fgets(letras,15,archivo);
-    //     printf("%s",letras);
-    //     printf("segunda linea:\n");
-    //     fgets(letras,200,archivo);
-    //     printf("%s",letras);
-    //     int largo;
-    //     largo = strlen(letras);
-    //     printf("%d\n",largo);
-    //     char *sin_espacios;
-    //     sin_espacios = eliminarEspacios(letras,largo);
-    //     printf("%s",sin_espacios);
-    //     free(sin_espacios);
-    // }
-    // fclose(archivo);
+    
 
     return 0;
 }

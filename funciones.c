@@ -4,8 +4,13 @@
 #include <string.h>
 
 char* eliminarEspacios(char *texto,int largo){
-
-    char *new = (char*)malloc(((largo-1)/2)*sizeof(char));
+    int n = 0;
+    for (int i = 0; i < largo; i++) {
+        if (texto[i] != ' ') {
+            n++;
+        }
+    }
+    char *new = (char*)malloc((n+1)*sizeof(char));
     int j=0;
     for(int i = 0;i<largo;i++){
         if(texto[i] !=' '){
@@ -13,6 +18,7 @@ char* eliminarEspacios(char *texto,int largo){
         }
     }
     new[j] = '\0';
+    strtok(new,"\n");
     return new;
 }
 
