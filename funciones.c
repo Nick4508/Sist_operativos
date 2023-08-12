@@ -3,12 +3,13 @@
 #include "funciones.h"
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 typedef struct 
 {
     int row;
     int col;
-    /* data */
 }coord;
 
 typedef struct 
@@ -18,9 +19,46 @@ typedef struct
     char orientacion[15];
     char palabra[50];
     double tiempo;
-    /* data */
 }datos_palabra;
 
+
+void carpetas(){
+    const char *vertical = "Vertical";
+    const char *horizontal = "Horizontal";
+    const char *tamanios[3] = {"50X50","100X100","200X200"};
+    
+    if(access(vertical,F_OK) != 0){
+        if(mkdir(vertical,0777) != 0){
+            perror("Carpeta ya existente");
+            return ;
+        }
+    }
+    if(access(horizontal,F_OK) != 0){
+        if(mkdir(horizontal,0777) != 0){
+            perror("Carpeta ya existente");
+            return ;
+        }
+    
+    }
+    for(int i = 0; i < 3;i++){
+        char dir1[50],dir2[50];
+        snprintf(dir1,sizeof(dir1),"%s/%s",vertical,tamanios[i]);
+        snprintf(dir2,sizeof(dir2),"%s/%s",horizontal,tamanios[i]);
+
+        if(access(dir1,F_OK)!=0){
+            if(mkdir(dir1,0777)!= 0){
+                perror("Carpeta ya existente");
+                return ;
+            }
+        }
+        if(access(dir2,F_OK)!=0){
+            if(mkdir(dir2,0777)!= 0){
+                perror("Carpeta ya existente");
+                return ;
+            }
+        }
+    }
+}
 
 char* eliminarEspacios(char *texto,int largo){
     int n = 0;
@@ -49,15 +87,20 @@ coord *encontrar_horizontal(char **matriz,char *palabra, int n){
     }
     // printf("%s\n",palabra);
     coord *a = (coord*)malloc(sizeof(coord));
-    // if ('P' == palabra[0]){printf(" si");}else{printf(" no");}
     for(int i = 0;i < n;i++){
         for(int j = 0;j < n;j++){
+            if((j+tope-cont) > n){
+                j=n;
+            }
             if(matriz[i][j] == palabra[cont]){
                 cont++;
+                
                 if(cont == tope){
                     a->row = i+1;
                     a->col = j+1;
-                    return a;}
+                    return a;
+                }
+
             }else{
                 cont = 0;
             }

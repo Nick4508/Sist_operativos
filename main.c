@@ -16,8 +16,12 @@ int main(){
         perror("Error al abrir el directorio");
         return EXIT_FAILURE;
     }
+    carpetas();
     datos_palabra *arreglo_salida[12];
-    int constante_salida = 0;
+    int constante_salida = 0, largo_salida = 0;
+    const char *tamanios[3] = {"50X50","100X100","200X200"};
+    const char *orientacion_salida[2] = {"Vertical","Horizontal"};
+
     while ((entrada = readdir(directorio)) != NULL) {
         size_t longitud = strlen(entrada->d_name);
         if (longitud >= 4 && entrada->d_name[longitud - 4] == '.' && entrada->d_name[longitud - 3] == 't' && entrada->d_name[longitud - 2] == 'x' && entrada->d_name[longitud - 1] == 't'){
@@ -35,9 +39,6 @@ int main(){
                 // printf("palabra :%s\n",nombre_archivo);
                 fgets(orientacion,15,archivo);
                 strtok(orientacion,"\n");
-
-                // printf("%s\n",orientacion);
-
                 fgets(letras,402,archivo);
                 strtok(letras,"\n");
 
@@ -48,17 +49,15 @@ int main(){
                         n++;
                     }
                 }
-                
                 n2 = (largo)/2;
                 // printf("%d\n",largo);
                 // printf("for %d; len/2 %d\n",n,n2);
                 char **matriz = (char**)malloc(n*sizeof(char*));
+                largo_salida = n;
                 char *sin_espacios;
                 
-
                 sin_espacios = eliminarEspacios(letras,largo);
                 matriz[0] = sin_espacios;
-
 
                 while(fgets(letras,402,archivo)!=NULL && fila <=n){
                     strtok(letras,"\n");
@@ -71,7 +70,6 @@ int main(){
                     
                 char cmp[12] = "vertical";
                 char cmp2[12] = "Vertical";
-
                 char try[12];
                 strncpy(try,orientacion,sizeof(cmp));
                 try[sizeof(try)-1] = '\0';
@@ -86,7 +84,6 @@ int main(){
                 }else{
                     // printf("-horizontal\n");
                     inicio = clock();
-                    // printf("%s\n",nombre_archivo);
                     coordenadas = encontrar_horizontal(matriz,nombre_archivo,n);
                     fin = clock();
                     tiempo = ((double) fin -inicio)/CLOCKS_PER_SEC;
@@ -113,8 +110,69 @@ int main(){
                 free(matriz);
                
             }
-            fclose(archivo);
+            fclose(archivo); 
+            char dir[258];
 
+            if(orientacion[0] == 'v' || orientacion[0] == 'V'){
+                if(largo_salida == 50){
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[0],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
+                }
+                else if (largo_salida == 100){
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[1],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
+
+                }else{
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[2],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
+
+                }                
+            }
+            else{
+                if(largo_salida == 50){
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[0],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
+                }
+                else if (largo_salida == 100){
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[1],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
+
+                }else{
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[2],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
+
+                }
+            }
 
         }
         
