@@ -45,13 +45,12 @@ int main(){
                 int largo,n=0,n2=0,fila = 1;
                 largo = strlen(letras);
                 for(int i = 0;i<largo;i++){
-                    if(letras[i] != ' '){
+                    int caracter = letras[i];
+                    if( caracter >= 65 && caracter <= 90){
                         n++;
                     }
                 }
-                n2 = (largo)/2;
-                // printf("%d\n",largo);
-                // printf("for %d; len/2 %d\n",n,n2);
+
                 char **matriz = (char**)malloc(n*sizeof(char*));
                 largo_salida = n;
                 char *sin_espacios;
@@ -74,7 +73,7 @@ int main(){
                 strncpy(try,orientacion,sizeof(cmp));
                 try[sizeof(try)-1] = '\0';
                 // printf("%s\n",orientacion);
-                clock_t inicio,fin;
+                clock_t inicio,fin,delta;
                 coord *coordenadas ;
                 double tiempo;
                 int *fila_columna;
@@ -84,8 +83,9 @@ int main(){
                 }else{
                     // printf("-horizontal\n");
                     inicio = clock();
-                    coordenadas = encontrar_horizontal(matriz,nombre_archivo,n);
+                    coordenadas = encontrar_horizontal_2(matriz,nombre_archivo,n);
                     fin = clock();
+                    delta = fin- inicio;
                     tiempo = ((double) fin -inicio)/CLOCKS_PER_SEC;
                     arreglo_salida[constante_salida] = (datos_palabra*)malloc(sizeof(datos_palabra));
                     arreglo_salida[constante_salida]->row = coordenadas->row;
@@ -93,6 +93,7 @@ int main(){
                     arreglo_salida[constante_salida]->tiempo = tiempo;
                     strcpy(arreglo_salida[constante_salida]->palabra,nombre_archivo);
                     strcpy(arreglo_salida[constante_salida]->orientacion,"horizontal");
+                    arreglo_salida[constante_salida]->delta = delta;
                     constante_salida++;
                     // printf("%f\n",tiempo);
                     // printf("%d,%d\n",coordenadas->row,coordenadas->col);
@@ -113,66 +114,66 @@ int main(){
             fclose(archivo); 
             char dir[258];
 
-            if(orientacion[0] == 'v' || orientacion[0] == 'V'){
-                if(largo_salida == 50){
-                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[0],entrada->d_name);
-                    if(rename(entrada->d_name,dir)==0){
-                        continue;
-                    }
-                    else{
-                        perror("error");
-                    }
-                }
-                else if (largo_salida == 100){
-                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[1],entrada->d_name);
-                    if(rename(entrada->d_name,dir)==0){
-                        continue;
-                    }
-                    else{
-                        perror("error");
-                    }
+            // if(orientacion[0] == 'v' || orientacion[0] == 'V'){
+            //     if(largo_salida == 50){
+            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[0],entrada->d_name);
+            //         if(rename(entrada->d_name,dir)==0){
+            //             continue;
+            //         }
+            //         else{
+            //             perror("error");
+            //         }
+            //     }
+            //     else if (largo_salida == 100){
+            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[1],entrada->d_name);
+            //         if(rename(entrada->d_name,dir)==0){
+            //             continue;
+            //         }
+            //         else{
+            //             perror("error");
+            //         }
 
-                }else{
-                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[2],entrada->d_name);
-                    if(rename(entrada->d_name,dir)==0){
-                        continue;
-                    }
-                    else{
-                        perror("error");
-                    }
+            //     }else{
+            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[2],entrada->d_name);
+            //         if(rename(entrada->d_name,dir)==0){
+            //             continue;
+            //         }
+            //         else{
+            //             perror("error");
+            //         }
 
-                }                
-            }
-            else{
-                if(largo_salida == 50){
-                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[0],entrada->d_name);
-                    if(rename(entrada->d_name,dir)==0){
-                        continue;
-                    }
-                    else{
-                        perror("error");
-                    }
-                }
-                else if (largo_salida == 100){
-                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[1],entrada->d_name);
-                    if(rename(entrada->d_name,dir)==0){
-                        continue;
-                    }
-                    else{
-                        perror("error");
-                    }
+            //     }                
+            // }
+            // else{
+            //     if(largo_salida == 50){
+            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[0],entrada->d_name);
+            //         if(rename(entrada->d_name,dir)==0){
+            //             continue;
+            //         }
+            //         else{
+            //             perror("error");
+            //         }
+            //     }
+            //     else if (largo_salida == 100){
+            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[1],entrada->d_name);
+            //         if(rename(entrada->d_name,dir)==0){
+            //             continue;
+            //         }
+            //         else{
+            //             perror("error");
+            //         }
 
-                }else{
-                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[2],entrada->d_name);
-                    if(rename(entrada->d_name,dir)==0){
-                        continue;
-                    }
-                    else{
-                        perror("error");
-                    }
+            //     }else{
+            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[2],entrada->d_name);
+            //         if(rename(entrada->d_name,dir)==0){
+            //             continue;
+            //         }
+            //         else{
+            //             perror("error");
+            //         }
 
-                }
-            }
+            //     }
+            // }
 
         }
         
@@ -181,6 +182,7 @@ int main(){
     for(int i = 0; i < constante_salida;i++){
         printf("palabra : %s\n",arreglo_salida[i]->palabra);
         printf("orientacion : %s\n",arreglo_salida[i]->orientacion);
+        printf("clocks : %ld\n",arreglo_salida[i]->delta);
         printf("tiempo : %f\n",arreglo_salida[i]->tiempo);
         printf("coord : %d,%d\n\n",arreglo_salida[i]->row,arreglo_salida[i]->col);
     }

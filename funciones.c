@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <time.h>
 
 typedef struct 
 {
@@ -16,6 +17,7 @@ typedef struct
 {
     int row;
     int col;
+    clock_t delta;
     char orientacion[15];
     char palabra[50];
     double tiempo;
@@ -78,6 +80,35 @@ char* eliminarEspacios(char *texto,int largo){
     new[j] = '\0';
     strtok(new,"\n");
     return new;
+}
+
+coord *encontrar_horizontal_2(char **matriz,char *palabra, int n){
+    int cont = 0,tope = strlen(palabra),o = 0;
+    for(int i = 0;palabra[i]!='\0';++i){
+        palabra[i] = toupper(palabra[i]);
+    }
+    coord *a = (coord*)malloc(sizeof(coord));
+    char busqueda[tope];
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            if((j+tope-cont) > n){
+                j=n;
+            }
+            if(matriz[i][j] == palabra[0]){
+                for(int u = 0; u < tope; u++){
+                    busqueda[u] = matriz[i][j+u];
+                }
+                busqueda[tope] = '\0';
+                if(strcmp(busqueda,palabra) == 0){
+                    a->row = i+1;
+                    a->col = j+1;
+                    return a;
+                }
+                
+            }
+        }
+    }
+
 }
 
 coord *encontrar_horizontal(char **matriz,char *palabra, int n){
