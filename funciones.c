@@ -140,3 +140,36 @@ coord *encontrar_horizontal(char **matriz,char *palabra, int n){
 
     
 }
+
+coord *encontrar_vertical(char **matriz, char *palabra, int n) {
+    coord *a = (coord *)malloc(sizeof(coord));
+    int tope = strlen(palabra);
+    
+    // Convertir la palabra a mayúsculas
+    for (int i = 0; palabra[i] != '\0'; ++i) {
+        palabra[i] = toupper(palabra[i]);
+    }
+    
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if ((i + tope) <= n) {
+                int encontrado = 1;
+                for (int u = 0; u < tope; u++) {
+                    if (matriz[i + u][j] != palabra[u]) {
+                        encontrado = 0;
+                        break;
+                    }
+                }
+                if (encontrado) {
+                    a->row = i + 1;
+                    a->col = j + 1;
+                    return a;
+                }
+            }
+        }
+    }
+    
+    // No debería llegar a este punto si la palabra siempre se encuentra
+    return NULL;
+}
+

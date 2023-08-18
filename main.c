@@ -78,7 +78,22 @@ int main(){
                 double tiempo;
                 int *fila_columna;
                 if(try[0] == 'v' || try[0] == 'V'){
-                    printf("-Vertical\n");
+                    //printf("-Vertical\n");
+                    /*inicio = clock();
+                    coordenadas = encontrar_vertical(matriz, nombre_archivo, n);
+                    fin = clock();
+                    delta = fin - inicio;
+                    tiempo = ((double)delta) / CLOCKS_PER_SEC;
+                    arreglo_salida[constante_salida] = (datos_palabra *)malloc(sizeof(datos_palabra));
+                    arreglo_salida[constante_salida]->row = coordenadas->row;
+                    arreglo_salida[constante_salida]->col = coordenadas->col;
+                    arreglo_salida[constante_salida]->tiempo = tiempo;
+                    strcpy(arreglo_salida[constante_salida]->palabra, nombre_archivo);
+                    strcpy(arreglo_salida[constante_salida]->orientacion, "vertical");
+                    arreglo_salida[constante_salida]->delta = delta;
+                    constante_salida++;
+                    free(coordenadas);
+                    */
                     //buscar vertical
                 }else{
                     // printf("-horizontal\n");
