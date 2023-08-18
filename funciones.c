@@ -82,7 +82,7 @@ char* eliminarEspacios(char *texto,int largo){
     return new;
 }
 
-coord *encontrar_horizontal_2(char **matriz,char *palabra, int n){
+coord *encontrar_horizontal(char **matriz,char *palabra, int n){
     int cont = 0,tope = strlen(palabra),o = 0;
     for(int i = 0;palabra[i]!='\0';++i){
         palabra[i] = toupper(palabra[i]);
@@ -111,7 +111,7 @@ coord *encontrar_horizontal_2(char **matriz,char *palabra, int n){
 
 }
 
-coord *encontrar_horizontal(char **matriz,char *palabra, int n){
+coord *encontrar_horizontal_2(char **matriz,char *palabra, int n){
     int cont = 0,tope = strlen(palabra);
     for(int i = 0;palabra[i]!='\0';++i){
         palabra[i] = toupper(palabra[i]);
@@ -171,7 +171,7 @@ coord *encontrar_vertical(char **matriz, char *palabra, int n) {
 }
     
 
-coord *encontrar_vertical2(char **matriz, char *palabra, int n) {
+coord *encontrar_vertical_2(char **matriz, char *palabra, int n) {
     int cont = 0, tope = strlen(palabra);
     for (int i = 0; palabra[i] != '\0'; ++i) {
         palabra[i] = toupper(palabra[i]);
@@ -181,7 +181,7 @@ coord *encontrar_vertical2(char **matriz, char *palabra, int n) {
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < n; i++) {
             if ((i + tope - cont) > n) {
-                i = n;
+                i = n-1;
             }
             if (matriz[i][j] == palabra[cont]) {
                 cont++;

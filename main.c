@@ -77,10 +77,14 @@ int main(){
                 coord *coordenadas ;
                 double tiempo;
                 int *fila_columna;
+                 // printf("Matriz de %dX%d\n",n,n);
+                // for(int i = 0;i < n;i++){
+                //     printf("%s\n",matriz[i]);
+                //  }
                 if(try[0] == 'v' || try[0] == 'V'){
                     //printf("-Vertical\n");
-                    /*inicio = clock();
-                    coordenadas = encontrar_vertical(matriz, nombre_archivo, n);
+                    inicio = clock();
+                    coordenadas = encontrar_vertical_2(matriz, nombre_archivo, n); 
                     fin = clock();
                     delta = fin - inicio;
                     tiempo = ((double)delta) / CLOCKS_PER_SEC;
@@ -93,7 +97,7 @@ int main(){
                     arreglo_salida[constante_salida]->delta = delta;
                     constante_salida++;
                     free(coordenadas);
-                    */
+                    
                     //buscar vertical
                 }else{
                     // printf("-horizontal\n");
@@ -115,10 +119,7 @@ int main(){
                     free(coordenadas);
                 }
 
-                // printf("Matriz de %dX%d\n",n,n);
-                // for(int i = 0;i < n;i++){
-                //     printf("%s\n",matriz[i]);
-                // }
+               
 
                 for(int i = 0;i<n;i++){
                     free(matriz[i]);
@@ -129,66 +130,66 @@ int main(){
             fclose(archivo); 
             char dir[258];
 
-            // if(orientacion[0] == 'v' || orientacion[0] == 'V'){
-            //     if(largo_salida == 50){
-            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[0],entrada->d_name);
-            //         if(rename(entrada->d_name,dir)==0){
-            //             continue;
-            //         }
-            //         else{
-            //             perror("error");
-            //         }
-            //     }
-            //     else if (largo_salida == 100){
-            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[1],entrada->d_name);
-            //         if(rename(entrada->d_name,dir)==0){
-            //             continue;
-            //         }
-            //         else{
-            //             perror("error");
-            //         }
+            if(orientacion[0] == 'v' || orientacion[0] == 'V'){
+                if(largo_salida == 50){
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[0],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
+                }
+                else if (largo_salida == 100){
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[1],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
 
-            //     }else{
-            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[2],entrada->d_name);
-            //         if(rename(entrada->d_name,dir)==0){
-            //             continue;
-            //         }
-            //         else{
-            //             perror("error");
-            //         }
+                }else{
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[0],tamanios[2],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
 
-            //     }                
-            // }
-            // else{
-            //     if(largo_salida == 50){
-            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[0],entrada->d_name);
-            //         if(rename(entrada->d_name,dir)==0){
-            //             continue;
-            //         }
-            //         else{
-            //             perror("error");
-            //         }
-            //     }
-            //     else if (largo_salida == 100){
-            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[1],entrada->d_name);
-            //         if(rename(entrada->d_name,dir)==0){
-            //             continue;
-            //         }
-            //         else{
-            //             perror("error");
-            //         }
+                }                
+            }
+            else{
+                if(largo_salida == 50){
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[0],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
+                }
+                else if (largo_salida == 100){
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[1],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
 
-            //     }else{
-            //         snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[2],entrada->d_name);
-            //         if(rename(entrada->d_name,dir)==0){
-            //             continue;
-            //         }
-            //         else{
-            //             perror("error");
-            //         }
+                }else{
+                    snprintf(dir,sizeof(dir),"%s/%s/%s",orientacion_salida[1],tamanios[2],entrada->d_name);
+                    if(rename(entrada->d_name,dir)==0){
+                        continue;
+                    }
+                    else{
+                        perror("error");
+                    }
 
-            //     }
-            // }
+                }
+            }
 
         }
         
