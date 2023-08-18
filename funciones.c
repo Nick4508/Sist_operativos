@@ -168,6 +168,7 @@ coord *encontrar_vertical(char **matriz, char *palabra, int n) {
             }
         }
     }
+}
     
 
 coord *encontrar_vertical2(char **matriz, char *palabra, int n) {
@@ -195,5 +196,6 @@ coord *encontrar_vertical2(char **matriz, char *palabra, int n) {
                 cont = 0;
             }
         }
-
+    }
+}
 
