@@ -5,7 +5,7 @@
 #include <dirent.h>
 #include <time.h>
 
-
+ 
 
 int main(){
     DIR *directorio;
@@ -183,11 +183,11 @@ int main(){
     }
     closedir(directorio);
     for(int i = 0; i < constante_salida;i++){
-        printf("palabra : %s\n",arreglo_salida[i]->palabra);
-        printf("orientacion : %s\n",arreglo_salida[i]->orientacion);
-        printf("clocks : %ld\n",arreglo_salida[i]->delta);
-        printf("tiempo : %f\n",arreglo_salida[i]->tiempo);
-        printf("coord : %d,%d\n\n",arreglo_salida[i]->row,arreglo_salida[i]->col);
+        printf("Palabra : %s\n",arreglo_salida[i]->palabra);
+        printf("Orientacion : %s\n",arreglo_salida[i]->orientacion);
+        printf("Clocks : %ld\n",arreglo_salida[i]->delta);
+        printf("Tiempo : %f\n",arreglo_salida[i]->tiempo);
+        printf("Coord : %d,%d\n\n",arreglo_salida[i]->row,arreglo_salida[i]->col);
     }
     for(int i = 0; i < constante_salida; i++){
         free(arreglo_salida[i]);
