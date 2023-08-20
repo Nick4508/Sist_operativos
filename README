@@ -1,0 +1,28 @@
+Nombres:
+    Manuel Silva 202173642-5 
+    Nicolas Rodríguez 202173515-1 
+
+Instrucciones de uso:
+    -Para compilar y ejecutar el programa se requiere que los archivos de prueba,
+    el archivo Make, main.c y funciones.c esten en la misma carpeta.
+    -Para compilar basta con ejecutar Make main y para ejecutar el programa basta con ./main.
+    -Para que el programa funcione correctamente solamente los archivos de prueba deben de terminar
+    en .txt, si hay un archivo .txt y que este no sea de prueba esto puede inducir a un error no deseado.
+
+Consideraciones:
+    -El programa muestra como salida las palabras, su orientacion, el tiempo demorado en encontrarse, y las
+    coordenadas donde se encontro en la matriz.
+    -El programa toma el directorio actual y procesa cada archivo .txt y luego lo mueve a su respectiva carpeta.
+    -Se asume que seran 12 archivos como maximo en un uso.
+    -Se asume que los archivos siempre estaran correctos.
+    -Se asume que la palabra a buscar siempre tendra un largo apropiado, y que no seran palabras de mas de 99 caracteres.
+    
+Bibliotecas usadas:
+    stdio.h
+    stdlib.h
+    string.h
+    ctype.h 
+    unistd.h 
+    sys/stat.h
+    time.h
+    dirent.h

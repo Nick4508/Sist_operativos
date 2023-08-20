@@ -1,13 +1,18 @@
-all: main
+TARGET = main
 
-main: main.o funciones.o
-	gcc main.o funciones.o -o main -Wall
+CC = gcc
+CFLAGS = -Wall -Wextra -g
 
-main.o: main.c funciones.h
-	gcc -c main.c
+SRCS = main.c funciones.c
+OBJS = $(SRCS:.c=.o)
 
-funciones.o: funciones.c funciones.h
-	gcc -c funciones.c
+$(TARGET): $(OBJS)
+    $(CC) $(CFLAGS) -o $@ $(OBJS)
 
-clean: 
-	rm -f main *.o
+%.o: %.c
+    $(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+    rm -f $(OBJS) $(TARGET)
+
+.PHONY: clean

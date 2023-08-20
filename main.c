@@ -5,7 +5,6 @@
 #include <dirent.h>
 #include <time.h>
 
-#define MAX_ARCHIVOS 12
 
 
 int main(){
@@ -36,7 +35,6 @@ int main(){
             if(archivo == NULL ){
                 printf("Error");
             }else{
-                // printf("palabra :%s\n",nombre_archivo);
                 fgets(orientacion,15,archivo);
                 strtok(orientacion,"\n");
                 fgets(letras,402,archivo);
@@ -68,21 +66,14 @@ int main(){
                 }
                     
                 char cmp[12] = "vertical";
-                char cmp2[12] = "Vertical";
                 char try[12];
                 strncpy(try,orientacion,sizeof(cmp));
                 try[sizeof(try)-1] = '\0';
-                // printf("%s\n",orientacion);
                 clock_t inicio,fin,delta;
                 coord *coordenadas ;
                 double tiempo;
-                int *fila_columna;
-                 // printf("Matriz de %dX%d\n",n,n);
-                // for(int i = 0;i < n;i++){
-                //     printf("%s\n",matriz[i]);
-                //  }
+               
                 if(try[0] == 'v' || try[0] == 'V'){
-                    //printf("-Vertical\n");
                     inicio = clock();
                     coordenadas = encontrar_vertical_2(matriz, nombre_archivo, n); 
                     fin = clock();
@@ -98,9 +89,7 @@ int main(){
                     constante_salida++;
                     free(coordenadas);
                     
-                    //buscar vertical
                 }else{
-                    // printf("-horizontal\n");
                     inicio = clock();
                     coordenadas = encontrar_horizontal_2(matriz,nombre_archivo,n);
                     fin = clock();
@@ -114,8 +103,6 @@ int main(){
                     strcpy(arreglo_salida[constante_salida]->orientacion,"horizontal");
                     arreglo_salida[constante_salida]->delta = delta;
                     constante_salida++;
-                    // printf("%f\n",tiempo);
-                    // printf("%d,%d\n",coordenadas->row,coordenadas->col);
                     free(coordenadas);
                 }
 
