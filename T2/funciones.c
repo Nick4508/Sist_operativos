@@ -21,8 +21,8 @@ typedef struct LABERINTO{
 typedef struct TABLERO{
     int sup_coord_limit[2];
     int inf_coord_limit[2];
-    char tablero[170][170];
-    char pares[2][50];
+    char **tablero;
+    char pares[50][4];
     int t_1;
     int t_2;
     int t_3;
@@ -32,7 +32,6 @@ typedef struct TABLERO{
     int cant_laberintos;
     int especiales;
     LABERINTO *laberintos;
-
 
 }TABLERO;
 
@@ -148,13 +147,58 @@ LABERINTO crear_laberintos(char *nombre,int id){
     return nuevo;
 };
 
+void mostrar_tablero(TABLERO *game){
+    int i = game->sup_coord_limit[0],j = game->sup_coord_limit[1],k = game->inf_coord_limit[0],u = game->inf_coord_limit[1];
+    if((i - 5) < 0){i = 0;}else{i-=5;}
+    if((j - 5) < 0){j = 0;}else{j-=5;}
+    if((k + 5) > 85){k = 85;}else{k+=5;}
+    if((u + 5) > 85){u = 85;}else{u+=5;}
+    printf("(%d,%d),(%d,%d)\n",i,j,k,u);
+    
+    for(i; i < k; i++){
+        for(j; j < u; j++){
+            printf("%c",game->tablero[i][j]);
+        }
+        printf("\n");
+    }
+}
 
-TABLERO *iniciar_tablero(LABERINTO *first){
+TABLERO *iniciar_tablero(){
     TABLERO *new = (TABLERO*)malloc(sizeof(TABLERO));
-
+    LABERINTO *cartas = (LABERINTO*)malloc(9*sizeof(LABERINTO));
+    cartas[0] = crear_laberintos("Inicio.txt",0);
+    char nombre[15];
+    for(int i = 1; i<9;i++){
+        snprintf(nombre,sizeof(nombre),"tablero%d.txt",i);
+        cartas[i] = crear_laberintos(nombre,i);
+    }
     new->camaras = 0;new->t_1 = 0;new->t_2 = 0;new->t_3 = 0;new->t_4 = 0;
     new->cant_laberintos = 1;new->especiales = 0;
-    LABERINTO *laberintos = (LABERINTO*)malloc(9*sizeof(LABERINTO));
+    new->laberintos = cartas;
+
+    char **tablero = (char**)malloc(85*sizeof(char*));
+    char linea[85] = "-------------------------------------------------------------------------------------";
+    for(int i = 0;i < 85; i++){
+        char *line = (char*)malloc(85*sizeof(char));
+        strcpy(line,linea);
+        tablero[i] = line;
+    }
+    int k = 39,u = 39;
+    for(int i = 0; i < 5; i++ ){
+        for(int j = 0;j < 15;j++){
+            if(!(cartas[0].maze[i][j] == ' ')){tablero[k][u] = cartas[0].maze[i][j];u++;}
+        }
+        for(int o = 44; o <85; o++){
+            tablero[k][o] = '-';
+        }
+        u = 39;
+        k++;
+    }
+    new->sup_coord_limit[0] = 39;
+    new->sup_coord_limit[1] = 39;
+    new->inf_coord_limit[0] = 44;
+    new->inf_coord_limit[1] = 44;
+    new->tablero = tablero;
 
     return new;
 }
