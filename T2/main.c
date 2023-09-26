@@ -3,16 +3,22 @@
 #include "funciones.c"
 
 int main(){ 
-
-    char nombre[20];
-    LABERINTO *laberintos = malloc(9*sizeof(LABERINTO));
-    laberintos[0] = crear_laberintos("Inicio.txt",0);
-    for(int i = 1; i < 9;i++){
+    TABLERO *game;
+    LABERINTO *cartas = (LABERINTO*)malloc(9*sizeof(LABERINTO));
+    cartas[0] = crear_laberintos("Inicio.txt",0);
+    char nombre[15];
+    for(int i = 1; i<9;i++){
         snprintf(nombre,sizeof(nombre),"tablero%d.txt",i);
-        laberintos[i] = crear_laberintos(nombre,i);
+        cartas[i] = crear_laberintos(nombre,i);
     }
-    cambiar_fichas(laberintos[0].maze); 
-          
+   
+    for(int j = 0;j<9;j++){
+    
+    for(int i  = 0 ; i <5;i++){
+        printf("%s\n",cartas[j].maze[i]); 
+    }
+    printf("----\n");
+    }
     return 0;  
-}     
-               
+}       
+                 
