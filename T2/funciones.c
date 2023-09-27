@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 typedef struct LABERINTO{
@@ -43,9 +44,9 @@ void cambiar_fichas(char **maze){
         for(int j = 0;j < 15; j++){
             if(maze[i][j] == 'J'){
                 if(maze[i][j+1] == '1'){maze[i][j] = 'J';j++;}
-                else if(maze[i][j+1] == '2'){maze[i][j] = 'Y';j++;}
-                else if(maze[i][j+1] == '3'){maze[i][j] = 'K';j++;}
-                else if(maze[i][j+1] == '4'){maze[i][j] = 'W';j++;}
+                else if(maze[i][j+1] == '2'){maze[i][j] = 'S';j++;}
+                else if(maze[i][j+1] == '3'){maze[i][j] = 'T';j++;}
+                else if(maze[i][j+1] == '4'){maze[i][j] = 'F';j++;}
            
             }
         }
@@ -61,28 +62,208 @@ void cambiar_fichas(char **maze){
     }    
 }
 
-int randomize(TABLERO *game, LABERINTO new){
+
+int randomize(TABLERO *game, LABERINTO *new,int id){
+    // if(true){
     if(game->tesoros == game->especiales){
-        int ram = rand() % 2;
+        int ram = rand() %2;
         if(ram){
-            int x = rand() % 10, y = rand() % 10;
             while(true){
-                if(!(new.maze[x][y] == 'E') && !(new.maze[x][y] == 'B') && !(new.maze[x][y] == '/') && !(new.maze[x][y] == ' ')){
-                    new.maze[x][y] = game->tesoros+1;
-                    if(game->tesoros == 0){game->t_1 = 1;}
-                    else if (game->tesoros == 1){game->t_2 = 1;}
-                    else if (game->tesoros == 2){game->t_3 = 1;}
-                    else if (game->tesoros == 3){game->t_4 = 1;}
-                    
+                int x = rand() % 5, y = rand() % 9;
+                if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(game->tesoros == 0){game->t_1 = 1;new[id].maze[x][y] = '1';}
+                    else if (game->tesoros == 1){game->t_2 = 1;new[id].maze[x][y] = '2';}
+                    else if (game->tesoros == 2){game->t_3 = 1;new[id].maze[x][y] = '3';}
+                    else if (game->tesoros == 3){game->t_4 = 1;new[id].maze[x][y] = '4';}
+                    game->tesoros = game->tesoros +1;
                     return 1;
                 }
             };
         }else{
+            int decider = rand() % 4;
+            //Camaras
+            if(decider == 1){
+                while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'C';
+                        game->camaras = game->camaras + 1;
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                    }
+                
+                }                
+            }
+            //+5 turnos
+            else if(decider == 2){
+                while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'U';//up
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                    }
+                
+                } 
+            }
+            //-3 turnos
+            else if(decider == 3){
+                while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'L'; //less
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                    }
+                
+                } 
+            }
+            //Tps por jugador
+            else if(decider == 4){}
+                int jugador = rand() % 4;
+                if(jugador == 1){
+                    while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'G';//tp player 1
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                        }
+                    } 
+                }
+                else if(jugador == 2){
+                    while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'R';//tp player 2
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                        }
+                    }
+                }
+                else if(jugador == 3){
+                    while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'V';//tp player 3
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                        }
+                    }
+                }
+                else if(jugador == 4){
+                    while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'Z';//tp player 4
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                        }
+                    }
+                }
             return 0;
             
         }
     }
+    else if(game->tesoros > game->especiales){
+        int decider = rand() % 4;
+            //Camaras
+            if(decider == 1){
+                while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'C';
+                        game->camaras = game->camaras + 1;
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                    }
+                
+                }                
+            }
+            //+5 turnos
+            else if(decider == 2){
+                while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'U';//up
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                    }
+                
+                } 
+            }
+            //-3 turnos
+            else if(decider == 3){
+                while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'L'; //less
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                    }
+                
+                } 
+            }
+            //Tps por jugador
+            else if(decider == 4){}
+                int jugador = rand() % 4;
+                if(jugador == 1){
+                    while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'G';//tp player 1
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                        }
+                    } 
+                }
+                else if(jugador == 2){
+                    while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'R';//tp player 2
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                        }
+                    }
+                }
+                else if(jugador == 3){
+                    while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'V';//tp player 3
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                        }
+                    }
+                }
+                else if(jugador == 4){
+                    while (true){
+                    int x = rand() % 5, y = rand() % 9;
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                        new[id].maze[x][y] = 'Z';//tp player 4
+                        game->especiales = game->especiales + 1;
+                        return 0;
+                        }
+                    }
+                }
+            return 0;
+            
+    }else{
+        while(true){
+            int x = rand() % 5, y = rand() % 9;
+            if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                if(game->tesoros == 0){game->t_1 = 1;new[id].maze[x][y] = '1';}
+                else if (game->tesoros == 1){game->t_2 = 1;new[id].maze[x][y] = '2';}
+                else if (game->tesoros == 2){game->t_3 = 1;new[id].maze[x][y] = '3';}
+                else if (game->tesoros == 3){game->t_4 = 1;new[id].maze[x][y] = '4';}
+                game->tesoros = game->tesoros +1;
+                return 1;
+            }
+        };
+    }
 }
+
 
 LABERINTO crear_laberintos(char *nombre,int id){
     FILE *archivo;
@@ -149,32 +330,24 @@ LABERINTO crear_laberintos(char *nombre,int id){
 
 void mostrar_tablero(TABLERO *game){
     int i = game->sup_coord_limit[0],j = game->sup_coord_limit[1],k = game->inf_coord_limit[0],u = game->inf_coord_limit[1];
-    if((i - 5) < 0){i = 0;}else{i-=5;}
-    if((j - 5) < 0){j = 0;}else{j-=5;}
-    if((k + 5) > 85){k = 85;}else{k+=5;}
-    if((u + 5) > 85){u = 85;}else{u+=5;}
-    printf("(%d,%d),(%d,%d)\n",i,j,k,u);
+    if((i - 5) < 0){i = 0;}else{i = i -5;}
+    if((j - 5) < 0){j = 0;}else{j =j-5;}
+    if((k + 5) > 85){k = 85;}else{k = k+5;}
+    if((u + 5) > 85){u = 85;}else{u= u+5;}
     
-    for(i; i < k; i++){
-        for(j; j < u; j++){
-            printf("%c",game->tablero[i][j]);
+    for(int o = i; o < k; o++){
+        for(int l = j; l < u; l++){
+            printf("%c",game->tablero[o][l]);
         }
         printf("\n");
     }
 }
 
-TABLERO *iniciar_tablero(){
+TABLERO *iniciar_tablero(LABERINTO *cartas){
     TABLERO *new = (TABLERO*)malloc(sizeof(TABLERO));
-    LABERINTO *cartas = (LABERINTO*)malloc(9*sizeof(LABERINTO));
-    cartas[0] = crear_laberintos("Inicio.txt",0);
-    char nombre[15];
-    for(int i = 1; i<9;i++){
-        snprintf(nombre,sizeof(nombre),"tablero%d.txt",i);
-        cartas[i] = crear_laberintos(nombre,i);
-    }
+    
     new->camaras = 0;new->t_1 = 0;new->t_2 = 0;new->t_3 = 0;new->t_4 = 0;
-    new->cant_laberintos = 1;new->especiales = 0;
-    new->laberintos = cartas;
+    new->cant_laberintos = 1;new->especiales = 0,new->tesoros = 0;
 
     char **tablero = (char**)malloc(85*sizeof(char*));
     char linea[85] = "-------------------------------------------------------------------------------------";
