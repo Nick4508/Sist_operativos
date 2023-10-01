@@ -23,7 +23,7 @@ typedef struct TABLERO{
     int sup_coord_limit[2];
     int inf_coord_limit[2];
     char **tablero;
-    char pares[50][4];
+    char **pares;
     int t_1;
     int t_2;
     int t_3;
@@ -31,9 +31,9 @@ typedef struct TABLERO{
     int tesoros;
     int camaras;
     int cant_laberintos;
+    int cant_pares;
     int especiales;
     LABERINTO *laberintos;
-
 }TABLERO;
 
 
@@ -61,7 +61,6 @@ void cambiar_fichas(char **maze){
         maze[i] = new;        
     }    
 }
-
 
 int randomize(TABLERO *game, LABERINTO *new,int id){
     // if(true){
@@ -264,7 +263,6 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
     }
 }
 
-
 LABERINTO crear_laberintos(char *nombre,int id){
     FILE *archivo;
     LABERINTO nuevo;
@@ -343,19 +341,40 @@ void mostrar_tablero(TABLERO *game){
     }
 }
 
+void randomize_deck(int *cards){
+    
+    for(int i = 1 ; i < 9; i++){
+        while (true){
+            int card = rand()% 8 +1, cont = 0;
+            for(int j = 0 ; j < i; j++){
+                if(card == cards[j]){
+                    cont++;                    
+                }
+            } 
+            if(cont == 0){
+                cards[i] = card;
+
+                break;
+            }
+        }
+    }
+}
+
 TABLERO *iniciar_tablero(LABERINTO *cartas){
     TABLERO *new = (TABLERO*)malloc(sizeof(TABLERO));
     
     new->camaras = 0;new->t_1 = 0;new->t_2 = 0;new->t_3 = 0;new->t_4 = 0;
-    new->cant_laberintos = 1;new->especiales = 0,new->tesoros = 0;
+    new->cant_laberintos = 1;new->especiales = 0,new->tesoros = 0;new->cant_pares = 0;
 
     char **tablero = (char**)malloc(85*sizeof(char*));
     char linea[85] = "-------------------------------------------------------------------------------------";
+    
     for(int i = 0;i < 85; i++){
         char *line = (char*)malloc(85*sizeof(char));
         strcpy(line,linea);
         tablero[i] = line;
     }
+    
     int k = 39,u = 39;
     for(int i = 0; i < 5; i++ ){
         for(int j = 0;j < 15;j++){
@@ -367,11 +386,103 @@ TABLERO *iniciar_tablero(LABERINTO *cartas){
         u = 39;
         k++;
     }
+    
+    char **pares = (char**)malloc(70*sizeof(char*));
+    char set[5] = "----";
+    for(int i = 0; i < 70; i++){
+        char *lineas = (char*)malloc(5*sizeof(char));
+        strcpy(lineas,set);
+        pares[i] = lineas;
+    }
+    new->pares = pares;
+ 
     new->sup_coord_limit[0] = 39;
     new->sup_coord_limit[1] = 39;
     new->inf_coord_limit[0] = 44;
     new->inf_coord_limit[1] = 44;
+    
     new->tablero = tablero;
 
     return new;
+}
+
+int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mesa,int origen){
+    char new_par[5];
+    if(orientacion == 'N'){
+        for(int i = game->cant_laberintos; i < 9;i++){
+            if(mazo[i] < 9){
+                if(cards[mazo[i]].sur){
+                    snprintf(new_par,sizeof(new_par),"%d%cS%d",origen,orientacion,cards[mazo[i]].id);
+                    strcpy(game->pares[game->cant_pares],new_par);
+                    snprintf(new_par,sizeof(new_par),"%dS%c%d",cards[mazo[i]].id,orientacion,origen);
+                    strcpy(game->pares[game->cant_pares + 1],new_par);
+
+                    mesa[game->cant_laberintos] = mazo[i];
+                    mazo[i] = 9;
+
+                    game->cant_laberintos++;
+                    game->cant_pares = game->cant_pares +2;
+                    return 1;
+                }
+            }
+        }
+    }
+    else if (orientacion == 'S'){
+        for(int i = game->cant_laberintos; i < 9;i++){
+            if(mazo[i] < 9){
+                if(cards[mazo[i]].sur){
+                    snprintf(new_par,sizeof(new_par),"%d%cN%d",origen,orientacion,cards[mazo[i]].id);
+                    strcpy(game->pares[game->cant_pares],new_par);
+                    snprintf(new_par,sizeof(new_par),"%dN%c%d",cards[mazo[i]].id,orientacion,origen);
+                    strcpy(game->pares[game->cant_pares + 1],new_par);
+
+                    mesa[game->cant_laberintos] = mazo[i];
+                    mazo[i] = 9;
+
+                    game->cant_laberintos++;
+                    game->cant_pares = game->cant_pares +2;
+                    return 1;
+                }
+            }
+        }
+    }
+    else if (orientacion == 'E'){
+        for(int i = game->cant_laberintos; i < 9;i++){
+            if(mazo[i] < 9){
+                if(cards[mazo[i]].este){
+                    snprintf(new_par,sizeof(new_par),"%d%cO%d",origen,orientacion,cards[mazo[i]].id);
+                    strcpy(game->pares[game->cant_pares],new_par);
+                    snprintf(new_par,sizeof(new_par),"%dO%c%d",cards[mazo[i]].id,orientacion,origen);
+                    strcpy(game->pares[game->cant_pares + 1],new_par);
+
+                    mesa[game->cant_laberintos] = mazo[i];
+                    mazo[i] = 9;
+
+                    game->cant_laberintos++;
+                    game->cant_pares = game->cant_pares +2;
+                    return 1;
+                }
+            }
+        }
+    }
+    else if (orientacion == 'O'){
+        for(int i = game->cant_laberintos; i < 9;i++){
+            if(mazo[i] < 9){
+                if(cards[mazo[i]].oeste){
+                    snprintf(new_par,sizeof(new_par),"%d%cE%d",origen,orientacion,cards[mazo[i]].id);
+                    strcpy(game->pares[game->cant_pares],new_par);
+                    snprintf(new_par,sizeof(new_par),"%dE%c%d",cards[mazo[i]].id,orientacion,origen);
+                    strcpy(game->pares[game->cant_pares + 1],new_par);
+
+                    mesa[game->cant_laberintos] = mazo[i];
+                    mazo[i] = 9;
+
+                    game->cant_laberintos++;
+                    game->cant_pares = game->cant_pares +2;
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
 }
