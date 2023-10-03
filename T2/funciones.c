@@ -486,3 +486,12 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
     }
     return 0;
 }
+
+typedef struct JUGADOR {
+    int id;           
+    int x;           
+    int y;            
+    int tesoros;      
+    char ficha;        
+} JUGADOR;
+
