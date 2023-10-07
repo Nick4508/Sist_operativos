@@ -19,6 +19,14 @@ typedef struct LABERINTO{
     /* data */
 }LABERINTO;
 
+typedef struct JUGADOR {
+    int id;           
+    int x;           
+    int y;            
+    int tesoros;      
+    char ficha;        
+} JUGADOR;
+
 typedef struct TABLERO{
     int sup_coord_limit[2];
     int inf_coord_limit[2];
@@ -34,6 +42,7 @@ typedef struct TABLERO{
     int cant_pares;
     int especiales;
     LABERINTO *laberintos;
+    JUGADOR jugadores[4];
 }TABLERO;
 
 
@@ -487,11 +496,4 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
     return 0;
 }
 
-typedef struct JUGADOR {
-    int id;           
-    int x;           
-    int y;            
-    int tesoros;      
-    char ficha;        
-} JUGADOR;
 
