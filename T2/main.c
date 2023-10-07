@@ -5,48 +5,95 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2]) {
-    // Lógica del jugador
+void mover_jugador(JUGADOR *jugador, char direccion, LABERINTO *laberinto, int cantidad) {
+    int nueva_x = jugador->x;
+    int nueva_y = jugador->y;
 
-    char movimiento = 'N'; // Movimiento del jugador (cambiar según sea necesario)
+    // Calcular la nueva posición del jugador según la dirección y cantidad
+    if (direccion == 'N') {
+        nueva_x -= cantidad;
+    } else if (direccion == 'S') {
+        nueva_x += cantidad;
+    } else if (direccion == 'E') {
+        nueva_y += cantidad;
+    } else if (direccion == 'O') {
+        nueva_y -= cantidad;
+    }
+
+    // Verificar si la nueva posición es válida
+    if (nueva_x >= 0 && nueva_x < 5 && nueva_y >= 0 && nueva_y < 15 &&
+        laberinto->maze[nueva_x][nueva_y] != 'B' && laberinto->maze[nueva_x][nueva_y] != '/') {
+        // La nueva posición es válida, actualiza la posición del jugador
+        jugador->x = nueva_x;
+        jugador->y = nueva_y;
+    } else {
+        // La nueva posición no es válida, el jugador no se mueve
+        printf("Movimiento no válido. El jugador permanece en su posición actual.\n");
+    }
+}
+
+void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2]) {
+    char movimiento = 'N'; // 'N', 'S', 'E', 'O' o 'C' (carta especial)
+    JUGADOR *jugador = &(game->jugadores[jugador_id - 1]);
+    char instruccion[10];
+    char orientacion;
+    char cantidad;
 
     if (jugador_id == 1) {
         // Jugador 1 envía instrucciones a través de tuberías a los otros jugadores
-        char instruccion[20];
-        snprintf(instruccion, sizeof(instruccion), "Moverte al Norte"); // Ejemplo de instrucción
+        // instrucción tiene que ser del tipo  (Norte, Cantidad 1)
+        snprintf(instruccion, sizeof(instruccion), "N 1");
         for (int i = 0; i < 3; i++) {
             write(pipe_fd[i][1], instruccion, sizeof(instruccion));
         }
     } else {
         // Jugadores 2, 3 y 4 reciben instrucciones a través de tuberías del Jugador 1
-        char instruccion_recibida[20];
-        read(pipe_fd[jugador_id - 2][0], instruccion_recibida, sizeof(instruccion_recibida));
-        printf("El Jugador %d recibió la instrucción: %s\n", jugador_id, instruccion_recibida);
+        read(pipe_fd[jugador_id - 2][0], instruccion, sizeof(instruccion));
+        printf("El Jugador %d recibió la instrucción: %s\n", jugador_id, instruccion);
+
+        // Analizar la instrucción recibida
+        if (sscanf(instruccion, "%c %c", &orientacion, &cantidad) == 2) {
+            if (orientacion == 'N' || orientacion == 'S' || orientacion == 'E' || orientacion == 'O') {
+                // La instrucción es un movimiento válido
+                printf("El jugador %d se mueve hacia la %c en una cantidad de %d.\n", jugador_id, orientacion, cantidad);
+                mover_jugador(jugador, orientacion, cartas, cantidad);
+            } else if (orientacion == 'L' || orientacion == 'B') {
+                printf("El jugador %d utiliza una carta especial: %c\n", jugador_id, orientacion);
+                // Hay que implementar cndo usa ladder o buscar :=)
+                if (orientacion == 'L') {
+                    // Logica Ladder
+                } else if (orientacion == 'B') {
+                    // Logica Buscar
+                }
+            } else {
+                // La orientación no es válida
+                printf("Orientación no válida: %c\n", orientacion);
+            }
+        } else {
+            // La instrucción no tiene el formato esperado
+            printf("Instrucción no válida: %s\n", instruccion);
+        }
     }
 
     // Bucle para que todos los jugadores realicen turnos
     for (int turno = 0; turno < 5; turno++) {
         // Lógica del jugador para decidir el movimiento o uso de cartas
-        // Ejemplo:
         if (movimiento == 'N') {
-            printf("El jugador %d se mueve hacia el Norte.\n", jugador_id);
-            // Llama a la función para mover al jugador hacia el Norte en el tablero
-            // Por ejemplo, puedes llamar a una función como move_player(game, jugador_id, 'N')
+            mover_jugador(jugador, 'N', cartas, 1); 
         } else if (movimiento == 'S') {
-            printf("El jugador %d se mueve hacia el Sur.\n", jugador_id);
-            
+            mover_jugador(jugador, 'S', cartas, 1); 
         } else if (movimiento == 'E') {
-            printf("El jugador %d se mueve hacia el Este.\n", jugador_id);
+            mover_jugador(jugador, 'E', cartas, 1); 
         } else if (movimiento == 'O') {
-            printf("El jugador %d se mueve hacia el Oeste.\n", jugador_id);
+            mover_jugador(jugador, 'O', cartas, 1); 
         } else {
             printf("El jugador %d utiliza una carta especial.\n", jugador_id);
         }
-
-        // Cambia el movimiento para el siguiente turno (puedes implementar tu lógica aquí)
-        movimiento = 'N'; // Cambiar esto según la lógica del juego
     }
 }
+
+
+
 
 int main(){ 
     srand((unsigned)time(NULL)); 
@@ -92,8 +139,8 @@ int main(){
     for (int jugador_id = 1; jugador_id <= 4; jugador_id++) {
         pid_t pid = fork();
 
-        if (pid == 0) { // Proceso hijo
-            jugador(jugador_id, game, cartas, pipe_fd); // Llamar a la función del jugador en el proceso hijo
+        if (pid == 0) { 
+            jugador(jugador_id, game, cartas, pipe_fd); 
             exit(0);
         }
     }
