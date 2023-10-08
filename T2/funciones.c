@@ -19,6 +19,14 @@ typedef struct LABERINTO{
     /* data */
 }LABERINTO;
 
+typedef struct JUGADOR {
+    int id;           
+    int x;           
+    int y;            
+    int tesoros;      
+    char ficha;        
+} JUGADOR;
+
 typedef struct TABLERO{
     int sup_coord_limit[2];
     int inf_coord_limit[2];
@@ -33,13 +41,15 @@ typedef struct TABLERO{
     int cant_laberintos;
     int cant_pares;
     int especiales;
+    int turnos;
     LABERINTO *laberintos;
+    JUGADOR *jugadores;
 }TABLERO;
 
 
 void cambiar_fichas(char **maze){
     //Reemplaza las fichas tipo jugador [J1,J2,J3,J4]
-    //Por las siguientes indicaciones J1->J,J2->Y,J3->K,J4->W;
+    //Por las siguientes indicaciones J1->J,J2->S,J3->T,J4->F;
     for(int i = 0;i < 5; i++){
         for(int j = 0;j < 15; j++){
             if(maze[i][j] == 'J'){
@@ -365,6 +375,7 @@ TABLERO *iniciar_tablero(LABERINTO *cartas){
     
     new->camaras = 0;new->t_1 = 0;new->t_2 = 0;new->t_3 = 0;new->t_4 = 0;
     new->cant_laberintos = 1;new->especiales = 0,new->tesoros = 0;new->cant_pares = 0;
+    new->turnos = 15;
 
     char **tablero = (char**)malloc(85*sizeof(char*));
     char linea[85] = "-------------------------------------------------------------------------------------";
@@ -403,6 +414,42 @@ TABLERO *iniciar_tablero(LABERINTO *cartas){
     
     new->tablero = tablero;
 
+    JUGADOR *jugadores = (JUGADOR*)malloc(4*sizeof(JUGADOR));
+    jugadores[0].id = 1; jugadores[1].id = 2; jugadores[2].id = 3; jugadores[3].id = 4;
+    jugadores[0].tesoros = 0; jugadores[1].tesoros = 0; jugadores[2].tesoros = 0; jugadores[3].tesoros = 0;
+    jugadores[0].x = 1; jugadores[0].y = 2;
+    jugadores[1].x = 1; jugadores[1].y = 6;
+    jugadores[2].x = 3; jugadores[2].y = 2;
+    jugadores[3].x = 3; jugadores[3].y = 6;
+
+    int buscar = 0, escalera = 0,cantidad = 4,actual = 0;
+    while (!(cantidad == 0)){
+        if(buscar == escalera){
+            int i = rand() % 2;
+            if(i){
+                buscar++;
+                jugadores[actual].ficha = 'B';
+                actual++;
+            }else{
+                escalera++;
+                jugadores[actual].ficha = 'E';
+                actual++;
+            }
+        }else{
+            if(buscar < escalera){
+                buscar++;
+                jugadores[actual].ficha = 'B';
+                actual++;
+            }else{
+                escalera++;
+                jugadores[actual].ficha = 'E';
+                actual++;
+            }
+        }
+        cantidad--;
+    }
+    new->jugadores = jugadores;
+
     return new;
 }
 
@@ -417,6 +464,8 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
                     snprintf(new_par,sizeof(new_par),"%dS%c%d",cards[mazo[i]].id,orientacion,origen);
                     strcpy(game->pares[game->cant_pares + 1],new_par);
 
+                    cards[origen].maze[0][4] = 'b';
+                    cards[mazo[i]].maze[4][4] = 'b';
                     mesa[game->cant_laberintos] = mazo[i];
                     mazo[i] = 9;
 
@@ -436,6 +485,8 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
                     snprintf(new_par,sizeof(new_par),"%dN%c%d",cards[mazo[i]].id,orientacion,origen);
                     strcpy(game->pares[game->cant_pares + 1],new_par);
 
+                    cards[origen].maze[4][4] = 'b';
+                    cards[mazo[i]].maze[0][4] = 'b';
                     mesa[game->cant_laberintos] = mazo[i];
                     mazo[i] = 9;
 
@@ -455,6 +506,8 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
                     snprintf(new_par,sizeof(new_par),"%dO%c%d",cards[mazo[i]].id,orientacion,origen);
                     strcpy(game->pares[game->cant_pares + 1],new_par);
 
+                    cards[origen].maze[2][8] = 'b';
+                    cards[mazo[i]].maze[2][0] = 'b';
                     mesa[game->cant_laberintos] = mazo[i];
                     mazo[i] = 9;
 
@@ -474,6 +527,8 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
                     snprintf(new_par,sizeof(new_par),"%dE%c%d",cards[mazo[i]].id,orientacion,origen);
                     strcpy(game->pares[game->cant_pares + 1],new_par);
 
+                    cards[origen].maze[2][0] = 'b';
+                    cards[mazo[i]].maze[2][8] = 'b';
                     mesa[game->cant_laberintos] = mazo[i];
                     mazo[i] = 9;
 
@@ -487,11 +542,4 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
     return 0;
 }
 
-typedef struct JUGADOR {
-    int id;           
-    int x;           
-    int y;            
-    int tesoros;      
-    char ficha;        
-} JUGADOR;
 
