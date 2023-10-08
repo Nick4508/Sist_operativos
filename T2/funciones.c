@@ -24,7 +24,8 @@ typedef struct JUGADOR {
     int x;           
     int y;            
     int tesoros;      
-    char ficha;        
+    char ficha;       
+    int laberinto; 
 } JUGADOR;
 
 typedef struct TABLERO{
@@ -79,7 +80,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
         if(ram){
             while(true){
                 int x = rand() % 5, y = rand() % 9;
-                if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                     if(game->tesoros == 0){game->t_1 = 1;new[id].maze[x][y] = '1';}
                     else if (game->tesoros == 1){game->t_2 = 1;new[id].maze[x][y] = '2';}
                     else if (game->tesoros == 2){game->t_3 = 1;new[id].maze[x][y] = '3';}
@@ -94,7 +95,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
             if(decider == 1){
                 while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'C';
                         game->camaras = game->camaras + 1;
                         game->especiales = game->especiales + 1;
@@ -107,7 +108,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
             else if(decider == 2){
                 while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'U';//up
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -119,7 +120,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
             else if(decider == 3){
                 while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'L'; //less
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -133,7 +134,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
                 if(jugador == 1){
                     while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'G';//tp player 1
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -143,7 +144,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
                 else if(jugador == 2){
                     while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'R';//tp player 2
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -153,7 +154,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
                 else if(jugador == 3){
                     while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'V';//tp player 3
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -163,7 +164,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
                 else if(jugador == 4){
                     while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'Z';//tp player 4
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -180,7 +181,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
             if(decider == 1){
                 while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'C';
                         game->camaras = game->camaras + 1;
                         game->especiales = game->especiales + 1;
@@ -193,7 +194,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
             else if(decider == 2){
                 while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'U';//up
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -205,7 +206,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
             else if(decider == 3){
                 while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'L'; //less
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -219,7 +220,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
                 if(jugador == 1){
                     while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'G';//tp player 1
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -229,7 +230,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
                 else if(jugador == 2){
                     while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'R';//tp player 2
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -239,7 +240,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
                 else if(jugador == 3){
                     while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'V';//tp player 3
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -249,7 +250,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
                 else if(jugador == 4){
                     while (true){
                     int x = rand() % 5, y = rand() % 9;
-                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+                    if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                         new[id].maze[x][y] = 'Z';//tp player 4
                         game->especiales = game->especiales + 1;
                         return 0;
@@ -261,7 +262,7 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
     }else{
         while(true){
             int x = rand() % 5, y = rand() % 9;
-            if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')){
+            if(!(new[id].maze[x][y] == 'E') && !(new[id].maze[x][y] == 'B') && !(new[id].maze[x][y] == '/') && !(new[id].maze[x][y] == ' ')&& !(new[id].maze[x][y] == 'J')&& !(new[id].maze[x][y] == 'S')&& !(new[id].maze[x][y] == 'T')&& !(new[id].maze[x][y] == 'F')){
                 if(game->tesoros == 0){game->t_1 = 1;new[id].maze[x][y] = '1';}
                 else if (game->tesoros == 1){game->t_2 = 1;new[id].maze[x][y] = '2';}
                 else if (game->tesoros == 2){game->t_3 = 1;new[id].maze[x][y] = '3';}
@@ -414,14 +415,40 @@ TABLERO *iniciar_tablero(LABERINTO *cartas){
     
     new->tablero = tablero;
 
-    JUGADOR *jugadores = (JUGADOR*)malloc(4*sizeof(JUGADOR));
-    jugadores[0].id = 1; jugadores[1].id = 2; jugadores[2].id = 3; jugadores[3].id = 4;
-    jugadores[0].tesoros = 0; jugadores[1].tesoros = 0; jugadores[2].tesoros = 0; jugadores[3].tesoros = 0;
-    jugadores[0].x = 1; jugadores[0].y = 2;
-    jugadores[1].x = 1; jugadores[1].y = 6;
-    jugadores[2].x = 3; jugadores[2].y = 2;
-    jugadores[3].x = 3; jugadores[3].y = 6;
 
+
+    return new;
+}
+
+JUGADOR iniciar_jugadores(int id){
+    JUGADOR nuevo;
+    if(id == 1){
+        nuevo.id = id;
+        nuevo.x = 1;
+        nuevo.y = 2;
+    }
+    if(id == 2){
+        nuevo.id = id;
+        nuevo.x = 1;
+        nuevo.y = 6;
+    }
+    if(id == 3){
+        nuevo.id = id;
+        nuevo.x = 3;
+        nuevo.y = 2;
+    }
+    if(id == 4){
+        nuevo.id = id;
+        nuevo.x = 3;
+        nuevo.y = 6;
+    }
+    nuevo.tesoros = 0;
+    nuevo.laberinto = 0;
+    nuevo.ficha = 'C';
+
+    return nuevo;
+}
+void asignar_carta(JUGADOR *jugadores){
     int buscar = 0, escalera = 0,cantidad = 4,actual = 0;
     while (!(cantidad == 0)){
         if(buscar == escalera){
@@ -448,9 +475,6 @@ TABLERO *iniciar_tablero(LABERINTO *cartas){
         }
         cantidad--;
     }
-    new->jugadores = jugadores;
-
-    return new;
 }
 
 int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mesa,int origen){
@@ -459,6 +483,7 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
         for(int i = game->cant_laberintos; i < 9;i++){
             if(mazo[i] < 9){
                 if(cards[mazo[i]].sur){
+                    int id_new_lab = cards[mazo[i]].id;
                     snprintf(new_par,sizeof(new_par),"%d%cS%d",origen,orientacion,cards[mazo[i]].id);
                     strcpy(game->pares[game->cant_pares],new_par);
                     snprintf(new_par,sizeof(new_par),"%dS%c%d",cards[mazo[i]].id,orientacion,origen);
@@ -471,7 +496,7 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
 
                     game->cant_laberintos++;
                     game->cant_pares = game->cant_pares +2;
-                    return 1;
+                    return id_new_lab;
                 }
             }
         }
@@ -479,7 +504,8 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
     else if (orientacion == 'S'){
         for(int i = game->cant_laberintos; i < 9;i++){
             if(mazo[i] < 9){
-                if(cards[mazo[i]].sur){
+                if(cards[mazo[i]].norte){
+                    int id_new_lab = cards[mazo[i]].id;
                     snprintf(new_par,sizeof(new_par),"%d%cN%d",origen,orientacion,cards[mazo[i]].id);
                     strcpy(game->pares[game->cant_pares],new_par);
                     snprintf(new_par,sizeof(new_par),"%dN%c%d",cards[mazo[i]].id,orientacion,origen);
@@ -492,7 +518,7 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
 
                     game->cant_laberintos++;
                     game->cant_pares = game->cant_pares +2;
-                    return 1;
+                    return id_new_lab;
                 }
             }
         }
@@ -500,7 +526,8 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
     else if (orientacion == 'E'){
         for(int i = game->cant_laberintos; i < 9;i++){
             if(mazo[i] < 9){
-                if(cards[mazo[i]].este){
+                if(cards[mazo[i]].oeste){
+                    int id_new_lab = cards[mazo[i]].id;
                     snprintf(new_par,sizeof(new_par),"%d%cO%d",origen,orientacion,cards[mazo[i]].id);
                     strcpy(game->pares[game->cant_pares],new_par);
                     snprintf(new_par,sizeof(new_par),"%dO%c%d",cards[mazo[i]].id,orientacion,origen);
@@ -513,7 +540,7 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
 
                     game->cant_laberintos++;
                     game->cant_pares = game->cant_pares +2;
-                    return 1;
+                    return id_new_lab;
                 }
             }
         }
@@ -521,7 +548,8 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
     else if (orientacion == 'O'){
         for(int i = game->cant_laberintos; i < 9;i++){
             if(mazo[i] < 9){
-                if(cards[mazo[i]].oeste){
+                if(cards[mazo[i]].este){
+                    int id_new_lab = cards[mazo[i]].id;
                     snprintf(new_par,sizeof(new_par),"%d%cE%d",origen,orientacion,cards[mazo[i]].id);
                     strcpy(game->pares[game->cant_pares],new_par);
                     snprintf(new_par,sizeof(new_par),"%dE%c%d",cards[mazo[i]].id,orientacion,origen);
@@ -534,7 +562,7 @@ int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mes
 
                     game->cant_laberintos++;
                     game->cant_pares = game->cant_pares +2;
-                    return 1;
+                    return id_new_lab;
                 }
             }
         }
