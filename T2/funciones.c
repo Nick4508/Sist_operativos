@@ -24,11 +24,13 @@ typedef struct JUGADOR {
     int x;           
     int y;            
     int tesoros;      
-    char ficha;       
+    char ficha;
+    char letra;       
     int laberinto; 
 } JUGADOR;
 
 typedef struct TABLERO{
+    int cant_tps;
     int sup_coord_limit[2];
     int inf_coord_limit[2];
     char **tablero;
@@ -426,21 +428,28 @@ JUGADOR iniciar_jugadores(int id){
         nuevo.id = id;
         nuevo.x = 1;
         nuevo.y = 2;
+        nuevo.letra = 'J';
     }
     if(id == 2){
         nuevo.id = id;
         nuevo.x = 1;
         nuevo.y = 6;
+        nuevo.letra = 'S';
+
     }
     if(id == 3){
         nuevo.id = id;
         nuevo.x = 3;
         nuevo.y = 2;
+        nuevo.letra = 'T';
+
     }
     if(id == 4){
         nuevo.id = id;
         nuevo.x = 3;
         nuevo.y = 6;
+        nuevo.letra = 'F';
+
     }
     nuevo.tesoros = 0;
     nuevo.laberinto = 0;
@@ -451,7 +460,7 @@ JUGADOR iniciar_jugadores(int id){
 
 void asignar_carta(JUGADOR *jugadores){
     int buscar = 0, escalera = 0,cantidad = 4,actual = 0;
-    while (!(cantidad == 0)){
+    while (cantidad>0){
         if(buscar == escalera){
             int i = rand() % 2;
             if(i){
