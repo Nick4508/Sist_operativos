@@ -5,6 +5,10 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+/*
+mover_jugador: Esta función se encarga de mover a un jugador en el laberinto en la dirección especificada por un número de casillas.
+También verifica si la nueva posición es válida y realiza acciones específicas en función de la casilla en la que se encuentra el jugador.
+*/
 void mover_jugador(JUGADOR *jugador, char direccion, LABERINTO *laberinto, int cantidad, TABLERO *game,int id_player) {
     int nueva_x = jugador[id_player-1].x;
     int nueva_y = jugador[id_player-1].y;
@@ -80,7 +84,10 @@ void mover_jugador(JUGADOR *jugador, char direccion, LABERINTO *laberinto, int c
         printf("Movimiento no válido. El jugador permanece en su posición actual.\n");
     }
 }
-
+/*
+jugador: Esta función representa a un jugador individual en el juego.
+Puede recibir instrucciones de movimiento o acciones especiales a través de tuberías y ejecutar las acciones correspondientes.
+*/
 void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2],int fd[4][2]) {
     char movimiento = 'N'; // 'N', 'S', 'E', 'O' o 'C' (carta especial)
     JUGADOR *jugador = &(game->jugadores[jugador_id - 1]);
@@ -121,7 +128,10 @@ void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2]
   
 
 }
-
+/*
+escalera: Esta función permite a un jugador utilizar una escalera para moverse entre áreas del laberinto.
+Dependiendo de la orientación, el jugador se moverá a una nueva ubicación en el laberinto.
+*/
 void escalera(LABERINTO *cards, JUGADOR *jugadores,int id_player, char orientacion){
     int x = jugadores[id_player-1].x;
     int y = jugadores[id_player-1].y;
@@ -182,7 +192,9 @@ void escalera(LABERINTO *cards, JUGADOR *jugadores,int id_player, char orientaci
     }//especial
 
 }
-
+/*
+pasar_a_laberinto: Esta función permite a un jugador moverse de un laberinto a otro utilizando una conexión previamente establecida.
+*/
 void pasar_a_laberinto(TABLERO *game,JUGADOR *jugadores, LABERINTO *cards, char orientacion, int *mazo,int *mesa,int id_player){
     int x = jugadores[id_player-1].x;
     int y = jugadores[id_player-1].y;
@@ -238,7 +250,10 @@ void pasar_a_laberinto(TABLERO *game,JUGADOR *jugadores, LABERINTO *cards, char 
     }
     
 }
-
+/*
+buscar: Esta función permite a un jugador realizar una acción de búsqueda en el laberinto para descubrir nuevos laberintos o tesoros.
+También maneja situaciones especiales, como moverse de un laberinto a otro a través de una búsqueda.
+*/
 void buscar(TABLERO *game,JUGADOR *jugadores, LABERINTO *cards, char orientacion, int *mazo,int *mesa,int id_player){
     int p;
     int x = jugadores[id_player-1].x;
@@ -317,7 +332,9 @@ void buscar(TABLERO *game,JUGADOR *jugadores, LABERINTO *cards, char orientacion
         }
     }
 }
-
+/*
+empezar_juego: Esta función muestra instrucciones y una descripción del juego al principio del programa y espera a que el jugador presione Enter para comenzar el juego.
+*/
 void empezar_juego(){
     printf("Usted jugara lo que se conoce como Magic Maze\nEsta es una vesion simplificada del juego con este nombre");
     printf("Este juego consiste en recolectar 4 tesoros distribuidos por un laberinto, y luego volver al principio, en una cantidad finita de turnos(15),cada tesoro estara numerado y pertenecera al correspondiente jugador\n");
@@ -347,7 +364,9 @@ void empezar_juego(){
         }
     }
 }
-
+/*
+mostrar_jugadores: Esta función muestra información sobre la posición y el estado de los jugadores en el laberinto
+*/
 void mostrar_jugadores(JUGADOR *jugadores,int id_player, LABERINTO *cards,TABLERO *game){
     int x = jugadores[id_player-1].x;
     int y = jugadores[id_player-1].y;
@@ -381,7 +400,9 @@ void mostrar_jugadores(JUGADOR *jugadores,int id_player, LABERINTO *cards,TABLER
     }
     printf("\n");
 }
-
+/*
+crear_jugadores: Esta función crea procesos hijo para representar a los cuatro jugadores del juego. Utiliza tuberías para la comunicación entre los procesos.
+*/
 void crear_jugadores(TABLERO *game, LABERINTO *cartas, int *random_cards, int *real_cards,int fd[4][2]) {
     // Crear tuberías para la comunicación entre los procesos
     int pipe_fd[3][2];
@@ -414,7 +435,9 @@ void crear_jugadores(TABLERO *game, LABERINTO *cartas, int *random_cards, int *r
         close(pipe_fd[i][1]);
     }
 }
-
+/*
+ejecutar_instruccion: Esta función ejecuta una instrucción dada por un jugador, que puede ser moverse, usar una escalera o realizar una búsqueda.
+*/
 void ejecutar_instruccion(int id_jugador, TABLERO *game,JUGADOR *jugadores,LABERINTO *cards,int *random_cards, int *real_cards,char orientacion,int cantidad){
 
     int id_origen,id_destino;
@@ -448,7 +471,9 @@ void ejecutar_instruccion(int id_jugador, TABLERO *game,JUGADOR *jugadores,LABER
 
 
 }
-
+/*
+main: Esta función es la función principal del programa. Inicializa el juego y ejecuta los turnos hasta que se cumpla una condición de victoria o se acaben los turnos.
+*/
 int main(){ 
     srand((unsigned)time(NULL)); 
 
