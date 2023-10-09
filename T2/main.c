@@ -46,14 +46,15 @@ void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2]
     char movimiento = 'N'; // 'N', 'S', 'E', 'O' o 'C' (carta especial)
     JUGADOR *jugador = &(game->jugadores[jugador_id - 1]);
     char instruccion[10];
-    char orientacion;
-    char cantidad;
+    int cantidad;
 
     if (jugador_id == 1) {
-        // Jugador 1 envía instrucciones a través de tuberías a los otros jugadores
-        // instrucción tiene que ser del tipo  (Norte, Cantidad 1)
-        snprintf(instruccion, sizeof(instruccion), "N 1");
-        for (int i = 0; i < 3; i++) {
+        // Jugador 1 genera las instrucciones
+        for (int i = 0; i < 4; i++) {
+            printf("Ingrese la instrucción para el jugador %d: ", i + 2);
+            scanf("%s", instruccion);
+
+            // Envia la instrucción al jugador correspondiente
             write(pipe_fd[i][1], instruccion, sizeof(instruccion));
         }
     } else {
@@ -62,23 +63,23 @@ void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2]
         printf("El Jugador %d recibió la instrucción: %s\n", jugador_id, instruccion);
 
         // Analizar la instrucción recibida
-        if (sscanf(instruccion, "%c %c", &orientacion, &cantidad) == 2) {
-            if (orientacion == 'N' || orientacion == 'S' || orientacion == 'E' || orientacion == 'O') {
-                // La instrucción es un movimiento válido
-                printf("El jugador %d se mueve hacia la %c en una cantidad de %d.\n", jugador_id, orientacion, cantidad);
-                mover_jugador(jugador, orientacion, cartas, cantidad);
-            } else if (orientacion == 'L' || orientacion == 'B') {
-                printf("El jugador %d utiliza una carta especial: %c\n", jugador_id, orientacion);
-                // Hay que implementar cndo usa ladder o buscar :=)
-                if (orientacion == 'L') {
-                    // Logica Ladder
-                } else if (orientacion == 'B') {
-                    // Logica Buscar
-                }
-            } else {
-                // La orientación no es válida
-                printf("Orientación no válida: %c\n", orientacion);
-            }
+        if (sscanf(instruccion, "%c %d", &movimiento, &cantidad) == 2) {
+    if (movimiento == 'N' || movimiento == 'S' || movimiento == 'E' || movimiento == 'O') {
+        // La instrucción es un movimiento válido
+        printf("El jugador %d se mueve hacia la %c en una cantidad de %d.\n", jugador_id, movimiento, cantidad);
+        mover_jugador(jugador, movimiento, cartas, cantidad);
+    } else if (movimiento == 'L' || movimiento == 'B') {
+        printf("El jugador %d utiliza una carta especial: %c\n", jugador_id, movimiento);
+        // Hay que implementar cndo usa ladder o buscar :=)
+        if (movimiento == 'L') {
+            // Logica Ladder
+        } else if (movimiento == 'B') {
+            // Logica Buscar
+        }
+    } else {
+        // La orientación no es válida
+        printf("Orientación no válida: %c\n", movimiento);
+    }
         } else {
             // La instrucción no tiene el formato esperado
             printf("Instrucción no válida: %s\n", instruccion);
@@ -89,13 +90,13 @@ void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2]
     for (int turno = 0; turno < 5; turno++) {
         // Lógica del jugador para decidir el movimiento o uso de cartas
         if (movimiento == 'N') {
-            mover_jugador(jugador, 'N', cartas, 1); 
+            mover_jugador(jugador, 'N', cartas, cantidad); 
         } else if (movimiento == 'S') {
-            mover_jugador(jugador, 'S', cartas, 1); 
+            mover_jugador(jugador, 'S', cartas, cantidad); 
         } else if (movimiento == 'E') {
-            mover_jugador(jugador, 'E', cartas, 1); 
+            mover_jugador(jugador, 'E', cartas, cantidad); 
         } else if (movimiento == 'O') {
-            mover_jugador(jugador, 'O', cartas, 1); 
+            mover_jugador(jugador, 'O', cartas, cantidad); 
         } else {
             printf("El jugador %d utiliza una carta especial.\n", jugador_id);
         }
