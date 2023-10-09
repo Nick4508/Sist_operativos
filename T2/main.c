@@ -5,36 +5,75 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-void mover_jugador(JUGADOR *jugador, char direccion, LABERINTO *laberinto, int cantidad) {
-    int nueva_x = jugador->x;
-    int nueva_y = jugador->y;
-
+void mover_jugador(JUGADOR *jugador, char direccion, LABERINTO *laberinto, int cantidad, TABLERO *game,int id_player) {
+    int nueva_x = jugador[id_player-1].x;
+    int nueva_y = jugador[id_player-1].y;
+    int id_laberinto = jugador[id_player-1].laberinto;
+    
+    int x  = jugador[id_player-1].x,y = jugador[id_player-1].y;
+    char ficha_atras = '0';
+    if(x == 0 && y == 4){ficha_atras = 'b';}
+    if(x == 4 && y == 4){ficha_atras = 'b';}
+    if(x == 2 && y == 8){ficha_atras = 'b';}
+    if(x == 2 && y == 0){ficha_atras = 'b';}
     // Calcular la nueva posición del jugador según la dirección y cantidad
     if (direccion == 'N') {
         nueva_x -= cantidad;
     } else if (direccion == 'S') {
         nueva_x += cantidad;
     } else if (direccion == 'E') {
-        nueva_y += cantidad;
+        nueva_y += 2*cantidad;
     } else if (direccion == 'O') {
-        nueva_y -= cantidad;
+        nueva_y -= 2*cantidad;
     }
 
     // Verificar si la nueva posición es válida
-    if (nueva_x >= 0 && nueva_x < 5 && nueva_y >= 0 && nueva_y < 15 &&
-        laberinto->maze[nueva_x][nueva_y] != 'B' && laberinto->maze[nueva_x][nueva_y] != '/') {
+    if (nueva_x >= 0 && nueva_x < 5 && nueva_y >= 0 && nueva_y < 9  && laberinto[id_laberinto].maze[nueva_x][nueva_y] != '/' && laberinto[id_laberinto].maze[nueva_x][nueva_y] != 'T' && laberinto[id_laberinto].maze[nueva_x][nueva_y] != 'S' && laberinto[id_laberinto].maze[nueva_x][nueva_y] != 'F' && laberinto[id_laberinto].maze[nueva_x][nueva_y] != 'J') {
         // La nueva posición es válida, actualiza la posición del jugador
-        jugador->x = nueva_x;
-        jugador->y = nueva_y;
+        laberinto[id_laberinto].maze[jugador[id_player-1].x][jugador[id_player-1].y] = ficha_atras;
+        
+        jugador[id_player-1].x = nueva_x;
+        jugador[id_player-1].y = nueva_y;
 
-        // Comprobar si la casilla tiene un número del 1 al 4 y si coincide con el ID del jugador
-        char casilla = laberinto->maze[nueva_x][nueva_y];
-        if (casilla >= '1' && casilla <= '4' && (casilla - '0') == jugador->id) {
+        laberinto[id_laberinto].maze[nueva_x][nueva_y] = jugador[id_player-1].letra;
+        // Comprobar el contenido de la casilla
+        char casilla = laberinto[id_laberinto].maze[nueva_x][nueva_y];
+        if (casilla == 'U') {
+            game->turnos += 5;
+        } else if (casilla == 'L') {
+            game->turnos -= 3;
+        } else if (casilla == 'G') {
+            if(game->cant_tps >= 2){
+                //se tepea
+            }else{
+                printf("No hay suficientes casillas de tp para poder usar esta casilla\n");
+            }
+        } else if (casilla == 'R') {
+            if(game->cant_tps >= 2){
+                //se tepea
+            }else{
+                printf("No hay suficientes casillas de tp para poder usar esta casilla\n");
+            }
+        } else if (casilla == 'V') {
+            if(game->cant_tps >= 2){
+                //se tepea
+            }else{
+                printf("No hay suficientes casillas de tp para poder usar esta casilla\n");
+            }
+        } else if (casilla == 'Z') {
+            if(game->cant_tps >= 2){
+                //se tepea
+            }else{
+                printf("No hay suficientes casillas de tp para poder usar esta casilla\n");
+            }
+        } else if (casilla == 'C') {
+            game->camaras++;
+        } else if (casilla >= '1' && casilla <= '4' && (casilla - '0') == jugador[id_player-1].id) {
             // El jugador ha encontrado un tesoro
-            printf("El jugador %d ha encontrado un tesoro en la casilla .\n", jugador->id);
-            jugador->tesoros++; // Sumar 1 al contador de tesoros del jugador
+            printf("El jugador %d ha encontrado un tesoro en la casilla %c.\n", jugador[id_player].id, casilla);
+            jugador[id_player].tesoros++; // Sumar 1 al contador de tesoros del jugador
             // Reemplazar la casilla con espacio en blanco para indicar que el tesoro ha sido recogido
-            laberinto->maze[nueva_x][nueva_y] = ' ';
+            laberinto[id_laberinto].maze[nueva_x][nueva_y] = ficha_atras;
         }
     } else {
         // La nueva posición no es válida, el jugador no se mueve
@@ -46,6 +85,7 @@ void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2]
     char movimiento = 'N'; // 'N', 'S', 'E', 'O' o 'C' (carta especial)
     JUGADOR *jugador = &(game->jugadores[jugador_id - 1]);
     char instruccion[10];
+    char instruccion_1[10];
     char instruccion_2[10];
     char instruccion_3[10];
     char instruccion_4[10];
@@ -53,57 +93,33 @@ void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2]
 
     if (jugador_id == 1) {
         // Jugador 1 genera las instrucciones
-        for (int i = 0; i < 4; i++) {
-            printf("Ingrese la instrucción para el jugador %d: ", i + 2);
-            scanf("%s", instruccion);
+        printf("Ingrese la instrucción para el jugador 1: ");
+        scanf("%s", instruccion_1);
+        printf("Ingrese la instrucción para el jugador 2: ");
+        scanf("%s", instruccion_2);
+        printf("Ingrese la instrucción para el jugador 3: ");
+        scanf("%s", instruccion_3);
+        printf("Ingrese la instrucción para el jugador 4: ");
+        scanf("%s", instruccion_4);
 
-            // Envia la instrucción al jugador correspondiente
-            write(pipe_fd[i][1], instruccion, sizeof(instruccion));
+        write(fd[0][1],instruccion_1,sizeof(instruccion_1));
+        write(fd[1][1],instruccion_2,sizeof(instruccion_2));
+        write(fd[2][1],instruccion_3,sizeof(instruccion_3));
+        write(fd[3][1],instruccion_4,sizeof(instruccion_4));
+        write(pipe_fd[0][1],instruccion_2,sizeof(instruccion_3));
+        write(pipe_fd[1][1],instruccion_3,sizeof(instruccion_3));
+        write(pipe_fd[2][1],instruccion_4,sizeof(instruccion_3));
+
+        // Envia la instrucción al jugador correspondiente
         }
-    } else {
+    else {
         // Jugadores 2, 3 y 4 reciben instrucciones a través de tuberías del Jugador 1
         read(pipe_fd[jugador_id - 2][0], instruccion, sizeof(instruccion));
         printf("El Jugador %d recibió la instrucción: %s\n", jugador_id, instruccion);
+    }
+  
+  
 
-        // Analizar la instrucción recibida
-        if (sscanf(instruccion, "%c %d", &movimiento, &cantidad) == 2) {
-    if (movimiento == 'N' || movimiento == 'S' || movimiento == 'E' || movimiento == 'O') {
-        // La instrucción es un movimiento válido
-        printf("El jugador %d se mueve hacia la %c en una cantidad de %d.\n", jugador_id, movimiento, cantidad);
-        mover_jugador(jugador, movimiento, cartas, cantidad);
-    } else if (movimiento == 'L' || movimiento == 'B') {
-        printf("El jugador %d utiliza una carta especial: %c\n", jugador_id, movimiento);
-        // Hay que implementar cndo usa ladder o buscar :=)
-        if (movimiento == 'L') {
-            // Logica Ladder
-        } else if (movimiento == 'B') {
-            // Logica Buscar
-        }
-    } else {
-        // La orientación no es válida
-        printf("Orientación no válida: %c\n", movimiento);
-    }
-        } else {
-            // La instrucción no tiene el formato esperado
-            printf("Instrucción no válida: %s\n", instruccion);
-        }
-    }
-
-    // Bucle para que todos los jugadores realicen turnos
-    for (int turno = 0; turno < 5; turno++) {
-        // Lógica del jugador para decidir el movimiento o uso de cartas
-        if (movimiento == 'N') {
-            mover_jugador(jugador, 'N', cartas, cantidad); 
-        } else if (movimiento == 'S') {
-            mover_jugador(jugador, 'S', cartas, cantidad); 
-        } else if (movimiento == 'E') {
-            mover_jugador(jugador, 'E', cartas, cantidad); 
-        } else if (movimiento == 'O') {
-            mover_jugador(jugador, 'O', cartas, cantidad); 
-        } else {
-            printf("El jugador %d utiliza una carta especial.\n", jugador_id);
-        }
-    }
 }
 
 void escalera(LABERINTO *cards, JUGADOR *jugadores,int id_player, char orientacion){
@@ -347,7 +363,7 @@ void mostrar_jugadores(JUGADOR *jugadores,int id_player, LABERINTO *cards,TABLER
     
     printf("El jugador numero: %d (%C) esta en el laberinto numero: %d\n",id_player,player,id_laberinto);
     printf("Coordenadas : X = %d,Y = %d\n",x+1,(y/2)+1);
-    printf("Carta: %d",jugadores[id_player].ficha);
+    printf("Carta: %c\n",jugadores[id_player-1].ficha);
     for(int i = 0; i < 5;i++){
         printf("%s\n",cards[id_laberinto].maze[i]);
     }printf("\n");
@@ -427,7 +443,7 @@ void ejecutar_instruccion(int id_jugador, TABLERO *game,JUGADOR *jugadores,LABER
         }
     }//Buscar 
     else{
-        
+        mover_jugador(jugadores,orientacion,cards,cantidad,game,id_jugador);
     }//mover
 
 
@@ -470,51 +486,77 @@ int main(){
         }
     }
 
+   empezar_juego();
+    char Orientacion,formato[15];
+    int numero;
     while (game->turnos > 0){
+        printf("TE QUEDAN %d ANTES DE QUE ACABE EL JUEGO\n",game->turnos);
         mostrar_jugadores(jugadores,1,cartas,game);
         mostrar_jugadores(jugadores,2,cartas,game);
         mostrar_jugadores(jugadores,3,cartas,game);
         mostrar_jugadores(jugadores,4,cartas,game);
 
         crear_jugadores(game,cartas,random_cards,real_cards,fd);
-        
+        read(fd[0][0],instruccion_1,sizeof(instruccion_1));
+        read(fd[1][0],instruccion_2,sizeof(instruccion_2));
+        read(fd[2][0],instruccion_3,sizeof(instruccion_3));
+        read(fd[3][0],instruccion_4,sizeof(instruccion_4));
 
+        for(int i = 1; i <5; i++){
+            if(i == 1){sscanf(instruccion_1,"%c%d",&Orientacion,&numero);}
+            if(i == 2){sscanf(instruccion_2,"%c%d",&Orientacion,&numero);}
+            if(i == 3){sscanf(instruccion_3,"%c%d",&Orientacion,&numero);}
+            if(i == 4){sscanf(instruccion_4,"%c%d",&Orientacion,&numero);}
+            
+            if((Orientacion == 'O' || Orientacion == 'N' || Orientacion == 'S' || Orientacion == 'E')&& (numero>0 && numero < 7)){
+                ejecutar_instruccion(i,game,jugadores,cartas,random_cards,real_cards,Orientacion,numero);
+            }else{
+                printf("Instruccion no valida, perdiste el turno del jugador %d\n",i);
+            }
+
+        }
+        int cont = 0;
+        for(int i = 0; i < 4; i++){
+            if(jugadores[i].tesoros && jugadores[i].laberinto == 0){
+                cont++;
+            }
+        }
+        if(cont == 4){
+            printf("Lograste recolectar todos los tesoros y volver al laberinto inicial, FELICIDADES\nHas ganado");
+            for (int i = 0; i < 4; i++) {
+                close(fd[i][0]);
+                close(fd[i][1]);
+            }
+        }
+        char linea[100];
+        printf("Presione enter para continuar\n");
+         while(true){
+        fgets(linea, sizeof(linea),stdin);
+        linea[strcspn(linea, "\n")] = '\0';
+        if(strlen(linea) == 0){
+            break;
+
+        }
+    }
         game->turnos--;
     }
+    printf("No lograste el objetivo,Has perdido ");
     
-    
-
-
-
-
-    int pipe_fd[3][2];
-    for (int i = 0; i < 3; i++) {
-        if (pipe(pipe_fd[i]) == -1) {
-            perror("pipe");
-            exit(1);
-        }
-    }
-
-    // Crear procesos hijos para representar a los jugadores
-    for (int jugador_id = 1; jugador_id <= 4; jugador_id++) {
-        pid_t pid = fork();
-
-        if (pid == 0) { 
-            // jugador(jugador_id, game, cartas, pipe_fd); 
-            exit(0);
-        }
-    }
-
-    // Esperar a que todos los procesos hijos terminen
     for (int i = 0; i < 4; i++) {
-        wait(NULL);
+        close(fd[i][0]);
+        close(fd[i][1]);
     }
 
-    // Cerrar las tuberías
-    for (int i = 0; i < 3; i++) {
-        close(pipe_fd[i][0]);
-        close(pipe_fd[i][1]);
-    }
+
+
+    // for(int i = 0; i < 9; i++){
+    //     for(int j = 0;)
+    //     free(cartas[i].maze);
+    // }
+    // free(cartas);
+    // free(jugadores);
+    // free(random_cards);
+    // free(real_cards);
 
     // Liberar memoria y realizar otras tareas de limpieza al final del juego
 
