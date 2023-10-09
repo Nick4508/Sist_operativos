@@ -4,7 +4,19 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdbool.h>
+/*
+LABERINTO:
 
+Contiene información sobre un laberinto en el juego.
+Campos:
+char **maze: Un puntero a un puntero de caracteres que representa el diseño del laberinto.
+int salidas: El número de salidas del laberinto.
+int escalera: Un indicador de si el laberinto tiene una escalera.
+int norte, int sur, int este, int oeste: Indicadores de si el laberinto tiene una salida en la dirección correspondiente (norte, sur, este, oeste).
+char tipo: El tipo de laberinto ('I' para Inicio, 'L' para en forma de L, 'T' para en forma de T).
+int id: Un identificador único para el laberinto.
+int tesoros: El número de tesoros en el laberinto
+*/
 typedef struct LABERINTO{
     char **maze;
     int salidas;
@@ -18,7 +30,18 @@ typedef struct LABERINTO{
     int tesoros;
     /* data */
 }LABERINTO;
+/*
+JUGADOR:
 
+Contiene información sobre un jugador en el juego.
+Campos:
+int id: El identificador único del jugador.
+int x, int y: Las coordenadas (posición) del jugador en el tablero.
+int tesoros: El número de tesoros recolectados por el jugador.
+char ficha: La ficha del jugador(Rol que tiene el jugador asignado).
+char letra: La letra asociada al jugador ('J', 'S', 'T', o 'F').
+int laberinto: Un indicador del laberinto en el que se encuentra el jugador.
+*/
 typedef struct JUGADOR {
     int id;           
     int x;           
@@ -28,7 +51,25 @@ typedef struct JUGADOR {
     char letra;       
     int laberinto; 
 } JUGADOR;
+/*
+TABLERO:
 
+Contiene información sobre el tablero de juego.
+Campos:
+int cant_tps: La cantidad de casillas de portal en el juego.
+int sup_coord_limit[2], int inf_coord_limit[2]: Limites superiores e inferiores del tablero.
+char **tablero: Un puntero a un puntero de caracteres que representa el diseño del tablero.
+char **pares: Un puntero a un puntero de caracteres para almacenar pares de casillas de portal.
+int t_1, int t_2, int t_3, int t_4: Indicadores de tesoros recolectados por los jugadores 1, 2, 3 y 4.
+int tesoros: El número total de tesoros en el tablero.
+int camaras: El número de cámaras de seguridad en el tablero.
+int cant_laberintos: La cantidad de laberintos en el tablero.
+int cant_pares: La cantidad de pares de tarjetas de portal.
+int especiales: La cantidad de elementos especiales en el tablero.
+int turnos: El número de turnos restantes en el juego.
+LABERINTO *laberintos: Un puntero a un arreglo de estructuras LABERINTO que almacena los laberintos en el juego.
+JUGADOR *jugadores: Un puntero a un arreglo de estructuras JUGADOR que almacena los jugadores en el juego.
+*/
 typedef struct TABLERO{
     int cant_tps;
     int sup_coord_limit[2];
@@ -49,7 +90,10 @@ typedef struct TABLERO{
     JUGADOR *jugadores;
 }TABLERO;
 
-
+/*
+Esta función reemplaza las fichas tipo jugador [J1, J2, J3, J4] por las siguientes indicaciones: 
+J1 por J, J2 por S, J3 por T, y J4 por F. Luego, elimina los números del laberinto.
+*/
 void cambiar_fichas(char **maze){
     //Reemplaza las fichas tipo jugador [J1,J2,J3,J4]
     //Por las siguientes indicaciones J1->J,J2->S,J3->T,J4->F;
@@ -74,7 +118,13 @@ void cambiar_fichas(char **maze){
         maze[i] = new;        
     }    
 }
-
+/*
+Esta función se encarga de asignar aleatoriamente tesoros o elementos especiales en el laberinto.
+Dependiendo de ciertas condiciones y probabilidades, puede:
+Agregar cámaras de seguridad 
+Aumentar o disminuir el número de turnos 
+Colocar puntos de teletransportación para los jugadores.
+*/
 int randomize(TABLERO *game, LABERINTO *new,int id){
     // if(true){
     if(game->tesoros == game->especiales){
@@ -275,7 +325,10 @@ int randomize(TABLERO *game, LABERINTO *new,int id){
         };
     }
 }
-
+/*
+Esta función crea un laberinto a partir de un archivo con el nombre especificado.
+Lee el contenido del archivo y crea una estructura LABERINTO con información sobre las salidas, escaleras, tipo de laberinto, tesoros, y el diseño del laberinto en sí.
+*/
 LABERINTO crear_laberintos(char *nombre,int id){
     FILE *archivo;
     LABERINTO nuevo;
@@ -338,7 +391,10 @@ LABERINTO crear_laberintos(char *nombre,int id){
     }
     return nuevo;
 };
-
+/*
+Esta función muestra en la consola una porción del tablero del juego
+delimitada por los valores de coordenadas sup_coord_limit e inf_coord_limit en la estructura TABLERO.
+*/
 void mostrar_tablero(TABLERO *game){
     int i = game->sup_coord_limit[0],j = game->sup_coord_limit[1],k = game->inf_coord_limit[0],u = game->inf_coord_limit[1];
     if((i - 5) < 0){i = 0;}else{i = i -5;}
@@ -353,7 +409,10 @@ void mostrar_tablero(TABLERO *game){
         printf("\n");
     }
 }
-
+/*
+Esta función baraja aleatoriamente las cartas de un mazo representado como un array de enteros.
+Cada carta tiene un valor del 1 al 8 y se asegura de que no haya cartas repetidas.
+*/
 void randomize_deck(int *cards){
     
     for(int i = 1 ; i < 9; i++){
@@ -372,7 +431,10 @@ void randomize_deck(int *cards){
         }
     }
 }
-
+/*
+Esta función inicializa un tablero de juego.
+Crea una estructura TABLERO con información sobre el tablero, las cartas de laberinto, las cámaras, los tesoros, etc.
+*/
 TABLERO *iniciar_tablero(LABERINTO *cartas){
     TABLERO *new = (TABLERO*)malloc(sizeof(TABLERO));
     
@@ -421,7 +483,10 @@ TABLERO *iniciar_tablero(LABERINTO *cartas){
 
     return new;
 }
-
+/*
+Esta función crea un jugador con un identificador único y asigna una letra (ficha) correspondiente según el jugador.
+Además, inicializa las coordenadas del jugador en el tablero y su cantidad de tesoros.
+*/
 JUGADOR iniciar_jugadores(int id){
     JUGADOR nuevo;
     if(id == 1){
@@ -457,7 +522,10 @@ JUGADOR iniciar_jugadores(int id){
 
     return nuevo;
 }
-
+/*
+Esta función asigna cartas a los jugadores.
+Las cartas pueden representar escaleras o buscar nuevos laberintos.
+*/
 void asignar_carta(JUGADOR *jugadores){
     int buscar = 0, escalera = 0,cantidad = 4,actual = 0;
     while (cantidad>0){
@@ -486,7 +554,10 @@ void asignar_carta(JUGADOR *jugadores){
         cantidad--;
     }
 }
-
+/*
+Esta función busca una carta de laberinto que coincida con la orientación especificada y la agrega al tablero de juego.
+También actualiza las conexiones entre laberintos en el tablero y en el mazo de cartas.
+*/
 int search(TABLERO *game, LABERINTO *cards, char orientacion, int *mazo,int *mesa,int origen){
     char new_par[5];
     if(orientacion == 'N'){
