@@ -42,10 +42,13 @@ void mover_jugador(JUGADOR *jugador, char direccion, LABERINTO *laberinto, int c
     }
 }
 
-void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2]) {
+void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2],int fd[4][2]) {
     char movimiento = 'N'; // 'N', 'S', 'E', 'O' o 'C' (carta especial)
     JUGADOR *jugador = &(game->jugadores[jugador_id - 1]);
     char instruccion[10];
+    char instruccion_2[10];
+    char instruccion_3[10];
+    char instruccion_4[10];
     int cantidad;
 
     if (jugador_id == 1) {
@@ -101,24 +104,6 @@ void jugador(int jugador_id, TABLERO *game, LABERINTO *cartas, int pipe_fd[3][2]
             printf("El jugador %d utiliza una carta especial.\n", jugador_id);
         }
     }
-}
-
-void turno(int jugador_id, TABLERO *game, LABERINTO *cartas ){
-    char datos_1[10];
-    char datos_2[10];
-    char datos_3[10];
-    char datos_4[10];
-    printf("Ingrese instruccion para jugador 1 (J):\n");
-    fgets(datos_1, sizeof(datos_1),stdin);
-    printf("Ingrese instruccion para jugador 2 (S):\n");
-    fgets(datos_2, sizeof(datos_2),stdin);
-    printf("Ingrese instruccion para jugador 3 (T):\n");
-    fgets(datos_3, sizeof(datos_3),stdin);
-
-    printf("Ingrese instruccion para jugador 4 (F):\n");
-    fgets(datos_4, sizeof(datos_4),stdin);
-
-
 }
 
 void escalera(LABERINTO *cards, JUGADOR *jugadores,int id_player, char orientacion){
@@ -330,8 +315,8 @@ void empezar_juego(){
     printf("El usar Escalera abre paso a los demas jugadores para poder pasar libremente, la accion Buscar permite acceder a nuevos laberintos que pueden llegar a contener los tesoros, cuando se haya colocado un laberinto en el tablero este pasara a poder transitarse sin necesidad de hacer la accion de nuevo\n");
     printf("Al ejecutar estas acciones especiales consumira el turno del jugador correspondiente\n");
     printf("En cada turno podra decidir sobre los demas jugadores, que deberan hacer estos, el formato de instruccion es el siguiente:\n");
-    printf("(Orientacion)(Cantidad/Especial), donde la orientacion puede ser 'N,S,E,O', la cantidad es un numero entre 1 y 4, y Especial es una accion Buscar o Escalera\n");
-    printf("Ejemplo: 'N4' indicando el moverse al Norte 4 posiciones, 'OB' indicando que se realize la Accion buscar hacia el oeste\n");
+    printf("(Orientacion)(Cantidad/Especial), donde la orientacion puede ser 'N,S,E,O', la cantidad es un numero entre 1 y 4, y Especial es una accion Buscar o Escalera, la accion Escalera sera el numero 5 y la accion Buscar es el numero 6\n");
+    printf("Ejemplo: 'N4' indicando el moverse al Norte 4 posiciones, 'O6' indicando que se realize la Accion buscar hacia el oeste\n");
     printf("Cualquier instruccion que no siga esos parametros se considera erronea y el jugador pierde el turno quedandose inmovil");
     printf("Situaciones especiales: cuando exista una conexion entre dos laberintos estara indicado y ademas las casillas que antes eran 'B' pasaran a ser 'b', para pasar de un laberinto a otro tendra que insertar una instruccion buscar, similar a como se agregan conexiones\n");
     printf("Una vez leidas las instrucciones y funcionamiento del juego, presione Enter para continuar");
@@ -362,6 +347,7 @@ void mostrar_jugadores(JUGADOR *jugadores,int id_player, LABERINTO *cards,TABLER
     
     printf("El jugador numero: %d (%C) esta en el laberinto numero: %d\n",id_player,player,id_laberinto);
     printf("Coordenadas : X = %d,Y = %d\n",x+1,(y/2)+1);
+    printf("Carta: %d",jugadores[id_player].ficha);
     for(int i = 0; i < 5;i++){
         printf("%s\n",cards[id_laberinto].maze[i]);
     }printf("\n");
@@ -380,7 +366,7 @@ void mostrar_jugadores(JUGADOR *jugadores,int id_player, LABERINTO *cards,TABLER
     printf("\n");
 }
 
-void crear_jugadores(TABLERO *game, LABERINTO *cartas, int *random_cards, int *real_cards) {
+void crear_jugadores(TABLERO *game, LABERINTO *cartas, int *random_cards, int *real_cards,int fd[4][2]) {
     // Crear tuberías para la comunicación entre los procesos
     int pipe_fd[3][2];
     for (int i = 0; i < 3; i++) {
@@ -396,7 +382,7 @@ void crear_jugadores(TABLERO *game, LABERINTO *cartas, int *random_cards, int *r
 
         if (pid == 0) { 
             // El proceso hijo ejecutará la función jugador()
-            jugador(jugador_id, game, cartas, pipe_fd); 
+            jugador(jugador_id, game, cartas, pipe_fd,fd); 
             exit(0);
         }
     }
@@ -411,6 +397,40 @@ void crear_jugadores(TABLERO *game, LABERINTO *cartas, int *random_cards, int *r
         close(pipe_fd[i][0]);
         close(pipe_fd[i][1]);
     }
+}
+
+void ejecutar_instruccion(int id_jugador, TABLERO *game,JUGADOR *jugadores,LABERINTO *cards,int *random_cards, int *real_cards,char orientacion,int cantidad){
+
+    int id_origen,id_destino;
+    char orientacion_origen,orientacion_destino;
+    if(cantidad == 5){
+        if(jugadores[id_jugador-1].ficha == 'E'){
+            escalera(cards,jugadores,id_jugador,orientacion);
+        }
+        else{
+            printf("El Jugador %d, no tiene la carta especial Escalera\n",id_jugador);
+        }
+    }//Escalera
+    else if (cantidad == 6){
+        if(jugadores[id_jugador-1].ficha == 'B'){
+            buscar(game,jugadores,cards,orientacion,random_cards,real_cards,id_jugador);
+        }
+        else{
+            for(int i = 0; i < game->cant_pares;i++){
+                sscanf(game->pares[i],"%d%c%c%d",&id_origen,&orientacion_origen,&orientacion_destino,&id_destino);
+                if(id_origen == jugadores[id_jugador-1].laberinto && orientacion == orientacion_origen){
+                    pasar_a_laberinto(game,jugadores,cards,orientacion,random_cards,real_cards,id_jugador);
+                    return;
+                }
+            }
+            printf("No es posible ejecutar la accion\n");
+        }
+    }//Buscar 
+    else{
+        
+    }//mover
+
+
 }
 
 int main(){ 
@@ -436,38 +456,34 @@ int main(){
     int *real_cards = (int*)malloc(9*sizeof(int)) ; // cartas en la mesa
     for(int i = 0; i < 9; i++){random_cards[i] = 0;real_cards[i] = 0;} // setearlas a 0
     randomize_deck(random_cards); // randomizar el mazo de cartas
-      
-    // empezar_juego();
-       
-    // while(game->turnos > 0){
+    
+    char instruccion_1[10];
+    char instruccion_2[10];
+    char instruccion_3[10];
+    char instruccion_4[10];
 
-    // }
-    // for(int i = 0; i < 9;i++){
-    //     printf("%d-",random_cards[i]); 
-    // }printf("\n");
-    // printf("a"); 
-    int p;
+    int fd[4][2];
+    for (int i = 0; i < 4; i++) {
+        if (pipe(fd[i]) == -1) {
+            perror("pipe");
+            exit(1);
+        }
+    }
+
+    while (game->turnos > 0){
+        mostrar_jugadores(jugadores,1,cartas,game);
+        mostrar_jugadores(jugadores,2,cartas,game);
+        mostrar_jugadores(jugadores,3,cartas,game);
+        mostrar_jugadores(jugadores,4,cartas,game);
+
+        crear_jugadores(game,cartas,random_cards,real_cards,fd);
+        
+
+        game->turnos--;
+    }
+    
     
 
-    // for(int i = 0; i < 5; i++){
-    //     printf("%s\n",cartas[0].maze[i]);
-    // }
-    // for(int i = 0; i<4;i++){
-    //     printf("%d,%C\n",jugadores[i].id,jugadores[i].ficha);
-    // }
-    // printf("C:%d",jugadores[0].id);
-    
-    
-
-    // for(int i = 0; i < 5; i++){
-    //     printf("%s\n",cartas[jugadores[0].laberinto].maze[i]);
-    // }printf("\n------\n");
-
-    mostrar_jugadores(jugadores,1,cartas,game);
-    mostrar_jugadores(jugadores,2,cartas,game);
-    mostrar_jugadores(jugadores,3,cartas,game);
-    mostrar_jugadores(jugadores,4,cartas,game);
-    // escalera(cartas,jugadores,1,'N');
 
 
 
