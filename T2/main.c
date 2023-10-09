@@ -26,6 +26,16 @@ void mover_jugador(JUGADOR *jugador, char direccion, LABERINTO *laberinto, int c
         // La nueva posición es válida, actualiza la posición del jugador
         jugador->x = nueva_x;
         jugador->y = nueva_y;
+
+        // Comprobar si la casilla tiene un número del 1 al 4 y si coincide con el ID del jugador
+        char casilla = laberinto->maze[nueva_x][nueva_y];
+        if (casilla >= '1' && casilla <= '4' && (casilla - '0') == jugador->id) {
+            // El jugador ha encontrado un tesoro
+            printf("El jugador %d ha encontrado un tesoro en la casilla .\n", jugador->id);
+            jugador->tesoros++; // Sumar 1 al contador de tesoros del jugador
+            // Reemplazar la casilla con espacio en blanco para indicar que el tesoro ha sido recogido
+            laberinto->maze[nueva_x][nueva_y] = ' ';
+        }
     } else {
         // La nueva posición no es válida, el jugador no se mueve
         printf("Movimiento no válido. El jugador permanece en su posición actual.\n");
@@ -367,6 +377,39 @@ void mostrar_jugadores(JUGADOR *jugadores,int id_player, LABERINTO *cards,TABLER
         }
     }
     printf("\n");
+}
+
+void crear_jugadores(TABLERO *game, LABERINTO *cartas, int *random_cards, int *real_cards) {
+    // Crear tuberías para la comunicación entre los procesos
+    int pipe_fd[3][2];
+    for (int i = 0; i < 3; i++) {
+        if (pipe(pipe_fd[i]) == -1) {
+            perror("pipe");
+            exit(1);
+        }
+    }
+
+    // Crear procesos hijos para representar a los jugadores
+    for (int jugador_id = 1; jugador_id <= 4; jugador_id++) {
+        pid_t pid = fork();
+
+        if (pid == 0) { 
+            // El proceso hijo ejecutará la función jugador()
+            jugador(jugador_id, game, cartas, pipe_fd); 
+            exit(0);
+        }
+    }
+
+    // Esperar a que todos los procesos hijos terminen
+    for (int i = 0; i < 4; i++) {
+        wait(NULL);
+    }
+
+    // Cerrar las tuberías
+    for (int i = 0; i < 3; i++) {
+        close(pipe_fd[i][0]);
+        close(pipe_fd[i][1]);
+    }
 }
 
 int main(){ 
