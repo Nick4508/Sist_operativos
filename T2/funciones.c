@@ -448,6 +448,7 @@ JUGADOR iniciar_jugadores(int id){
 
     return nuevo;
 }
+
 void asignar_carta(JUGADOR *jugadores){
     int buscar = 0, escalera = 0,cantidad = 4,actual = 0;
     while (!(cantidad == 0)){

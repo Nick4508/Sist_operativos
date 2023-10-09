@@ -110,6 +110,67 @@ void turno(int jugador_id, TABLERO *game, LABERINTO *cartas ){
 
 }
 
+void escalera(LABERINTO *cards, JUGADOR *jugadores,int id_player, char orientacion){
+    int x = jugadores[id_player-1].x;
+    int y = jugadores[id_player-1].y;
+    char player;
+    if(id_player == 1){player = 'J';}
+    if(id_player == 2){player = 'S';}
+    if(id_player == 3){player = 'T';}
+    if(id_player == 4){player = 'F';}
+    char ficha_atras = '0';
+    if(x == 0 && y == 4){ficha_atras = 'b';}
+    if(x == 4 && y == 4){ficha_atras = 'b';}
+    if(x == 2 && y == 8){ficha_atras = 'b';}
+    if(x == 2 && y == 0){ficha_atras = 'b';}
+    int id_laberinto = jugadores[id_player-1].laberinto;
+    int x_escalera,y_escalera;
+    if(orientacion == 'N'){ 
+        x_escalera = x-1;
+        y_escalera = y;
+        cards[id_laberinto].maze[x][y] = ficha_atras;
+        cards[id_laberinto].maze[x_escalera][y_escalera] = '0';
+        cards[id_laberinto].maze[x_escalera-1][y_escalera] = player;
+
+    }
+    else if(orientacion == 'S'){
+        x_escalera = x+1;
+        y_escalera = y;
+        if(id_laberinto == 3){
+            cards[id_laberinto].maze[x][y] = 'b';
+            cards[id_laberinto].maze[x_escalera][y_escalera] = '0';
+            cards[id_laberinto].maze[x_escalera+2][y] = player;
+            return;
+        }
+        cards[id_laberinto].maze[x][y] = ficha_atras;
+        cards[id_laberinto].maze[x_escalera][y_escalera] = '0';
+        cards[id_laberinto].maze[x_escalera+1][y] = player;
+    }// especial
+    else if(orientacion == 'E'){
+        x_escalera = x;
+        y_escalera = y+2;
+        cards[id_laberinto].maze[x][y] = ficha_atras;
+        cards[id_laberinto].maze[x_escalera][y_escalera] = '0';
+        cards[id_laberinto].maze[x_escalera][y_escalera+2] = player;
+
+    }
+    else if(orientacion == 'O'){
+        x_escalera = x;
+        y_escalera = y-2;
+        if(id_laberinto == 8){
+            cards[id_laberinto].maze[x][y] = 'b';
+            cards[id_laberinto].maze[x_escalera][y_escalera] = '0';
+            cards[id_laberinto].maze[x_escalera][y_escalera-4] = player;
+            return;
+        }
+        cards[id_laberinto].maze[x][y] = ficha_atras;
+        cards[id_laberinto].maze[x_escalera][y_escalera] = '0';
+        cards[id_laberinto].maze[x_escalera][y_escalera-2] = player;
+
+    }//especial
+
+}
+
 void pasar_a_laberinto(TABLERO *game,JUGADOR *jugadores, LABERINTO *cards, char orientacion, int *mazo,int *mesa,int id_player){
     int x = jugadores[id_player-1].x;
     int y = jugadores[id_player-1].y;
@@ -275,6 +336,39 @@ void empezar_juego(){
     }
 }
 
+void mostrar_jugadores(JUGADOR *jugadores,int id_player, LABERINTO *cards,TABLERO *game){
+    int x = jugadores[id_player-1].x;
+    int y = jugadores[id_player-1].y;
+    int id_laberinto = jugadores[id_player-1].laberinto;
+    int id_origen,id_destino;
+    char orientacion_origen,orientacion_destino;
+    const char *orientaciones[4] = {"Norte","Sur","Este","Oeste"};
+    char player;
+    if(id_player == 1){player = 'J';}
+    if(id_player == 2){player = 'S';}
+    if(id_player == 3){player = 'T';}
+    if(id_player == 4){player = 'F';}
+    
+    printf("El jugador numero: %d (%C) esta en el laberinto numero: %d\n",id_player,player,id_laberinto);
+    printf("Coordenadas : X = %d,Y = %d\n",x+1,(y/2)+1);
+    for(int i = 0; i < 5;i++){
+        printf("%s\n",cards[id_laberinto].maze[i]);
+    }printf("\n");
+
+    int aux;
+    for(int i = 0; i < game->cant_pares;i++){
+        sscanf(game->pares[i],"%d%c%c%d",&id_origen,&orientacion_origen,&orientacion_destino,&id_destino);
+        if(id_origen == id_laberinto){
+            if(orientacion_origen == 'N'){aux = 0;}
+            if(orientacion_origen == 'S'){aux = 1;}
+            if(orientacion_origen == 'E'){aux = 2;}
+            if(orientacion_origen == 'O'){aux = 3;}
+            printf("El laberinto en el %s,esta conectado con el laberinto %d\n",orientaciones[aux],id_destino);
+        }
+    }
+    printf("\n");
+}
+
 int main(){ 
     srand((unsigned)time(NULL)); 
 
@@ -309,8 +403,7 @@ int main(){
     // }printf("\n");
     // printf("a"); 
     int p;
-    cartas[0].maze[1][6] ='0';
-    cartas[0].maze[0][4] ='S';
+    
 
     // for(int i = 0; i < 5; i++){
     //     printf("%s\n",cartas[0].maze[i]);
@@ -319,38 +412,19 @@ int main(){
     //     printf("%d,%C\n",jugadores[i].id,jugadores[i].ficha);
     // }
     // printf("C:%d",jugadores[0].id);
-    jugadores[1].x = 0; 
-    jugadores[1].y = 4; 
-    jugadores[1].ficha = 'B';
+    
+    
 
-    buscar(game,jugadores,cartas,'N',random_cards,real_cards,2);
-    for(int i = 0; i < 5; i++){
-        printf("%s\n",cartas[0].maze[i]);
-    }printf("\n------\n");   
+    // for(int i = 0; i < 5; i++){
+    //     printf("%s\n",cartas[jugadores[0].laberinto].maze[i]);
+    // }printf("\n------\n");
 
-    for(int i = 0; i < 5; i++){
-        printf("%s\n",cartas[jugadores[1].laberinto].maze[i]);
-    }printf("\n------\n");
+    mostrar_jugadores(jugadores,1,cartas,game);
+    mostrar_jugadores(jugadores,2,cartas,game);
+    mostrar_jugadores(jugadores,3,cartas,game);
+    mostrar_jugadores(jugadores,4,cartas,game);
+    // escalera(cartas,jugadores,1,'N');
 
-    pasar_a_laberinto(game,jugadores,cartas,'S',random_cards,real_cards,2);
-
-    printf("laberinto jugador:%d\n",jugadores[1].laberinto);
-    printf("X:%d,Y:%d\n",jugadores[1].x,jugadores[1].y);
-    for(int i = 0; i < 5; i++){
-        printf("%s\n",cartas[jugadores[1].laberinto].maze[i]);
-    }printf("\n------\n");
-    // p  = search(game,cartas,'E',random_cards,real_cards,0); 
-    // for(int i = 0; i < 2;i++){
-    //     for(int j = 0; j < 5;j++){
-    //         printf("%s\n",cartas[real_cards[i]].maze[j]);
-    //     }
-    //     printf("\n");
-    // }
-    // p  = search(game,cartas,'E',random_cards,real_cards,0); 
-    // printf("%d\n%d\n",real_cards[1],real_cards[2]); 
-    // for(int i = 0; i < 9;i++){
-    //     printf("%d-",random_cards[i]); 
-    // }printf("\n");
 
 
     int pipe_fd[3][2];
