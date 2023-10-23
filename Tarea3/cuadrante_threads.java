@@ -84,6 +84,14 @@
                 segundo_sector.start();
                 tercer_sector.start();
                 cuarto_sector.start();
+                try{
+                    primer_sector.join();
+                    segundo_sector.join();
+                    tercer_sector.join();
+                    cuarto_sector.join();
+                }catch(InterruptedException e){
+                    
+                }
             }
         }
     }

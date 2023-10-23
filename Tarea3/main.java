@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.ForkJoinPool;
 
 public class main{
     public static void main(String[] args){
@@ -45,23 +46,28 @@ public class main{
         //     }
         // }
         int largo_palabra = palabra.length();
-        // System.out.println(largo_palabra);
+        System.out.printf("Palabra : %s\n",palabra);
         long tiempo = System.currentTimeMillis();
         cuadrante_threads inicio = new cuadrante_threads(palabra,1,1, N, largo_palabra, matriz, tiempo);
         System.out.printf("Tiempo y posicion con hebras:\n");
         inicio.start();
-        
         try{
-
             inicio.join();
+
         }catch(InterruptedException e){
-            
+
         }
         
-        long tiempo_3 = System.currentTimeMillis();
-        linea_a_linea busqueda = new linea_a_linea(tiempo_3,matriz,N,largo_palabra,palabra);
-        System.out.printf("Tiempo y posicion linea a linea:\n");
+        System.out.printf("\nTiempo y posicion con Fork/RecursiveTask:\n");
+        long tiempo_2 = System.currentTimeMillis();
+        ForkJoinPool pool = new ForkJoinPool();
+        pool.invoke(new cuadrante_forks(palabra, 1, 1, N, largo_palabra, matriz, tiempo_2));
 
-        busqueda.start();
+        // System.out.printf("\nBusqueda : %d",busqueda);
+        // long tiempo_3 = System.currentTimeMillis();
+        // linea_a_linea busqueda = new linea_a_linea(tiempo_3,matriz,N,largo_palabra,palabra);
+        // System.out.printf("Tiempo y posicion linea a linea:\n");
+
+        // busqueda.start();
     }
 }
