@@ -61,9 +61,9 @@ public class main{
         System.out.printf("\nTiempo y posicion con Fork/RecursiveTask:\n");
         long tiempo_2 = System.currentTimeMillis();
         ForkJoinPool pool = new ForkJoinPool();
-        pool.invoke(new cuadrante_forks(palabra, 1, 1, N, largo_palabra, matriz, tiempo_2));
+        Integer busqueda = pool.invoke(new cuadranteForks(palabra, 1, 1, N, largo_palabra, matriz, tiempo_2));
 
-        // System.out.printf("\nBusqueda : %d",busqueda);
+        System.out.printf("\nBusqueda : %d",busqueda);
         // long tiempo_3 = System.currentTimeMillis();
         // linea_a_linea busqueda = new linea_a_linea(tiempo_3,matriz,N,largo_palabra,palabra);
         // System.out.printf("Tiempo y posicion linea a linea:\n");
