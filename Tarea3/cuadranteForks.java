@@ -1,4 +1,5 @@
 import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class cuadranteForks extends RecursiveTask<Integer>{
     private long tiempo_inicio;
@@ -8,6 +9,8 @@ public class cuadranteForks extends RecursiveTask<Integer>{
     private int relative_y;
     private String palabra;
     private String[][] matriz;
+
+    private AtomicBoolean stop = new AtomicBoolean(false);
 
     public cuadranteForks(String palabra, int relative_x,int relative_y,int N, int largo_palabra, String[][] matriz, long tiempo){
         this.N = N;
@@ -31,6 +34,7 @@ public class cuadranteForks extends RecursiveTask<Integer>{
                 System.out.printf("Fila : %d, Columna: %d\n" ,relative_x+i, relative_y);
                 long busqueda = tiempo_final-tiempo_inicio;
                 System.out.printf("Se demoró %d milisegundos\n",busqueda);
+                stop.set(true);
                 return 1;
             }
         }
@@ -49,6 +53,7 @@ public class cuadranteForks extends RecursiveTask<Integer>{
                 System.out.printf("Fila : %d, Columna: %d\n" ,relative_x, relative_y + i);
                 long busqueda = tiempo_final-tiempo_inicio;
                 System.out.printf("Se demoró %d milisegundos\n",busqueda);
+                stop.set(true);
                 return 1;
             }
         }
@@ -61,44 +66,47 @@ public class cuadranteForks extends RecursiveTask<Integer>{
             
         }else{
             String[][] matriz_1 = new String[N/2][N/2];
-                String[][] matriz_2 = new String[N/2][N/2];
-                String[][] matriz_3 = new String[N/2][N/2];
-                String[][] matriz_4 = new String[N/2][N/2];
-                for(int i = 0; i < N/2;i ++){
-                    for(int j  = 0; j< N/2;j++){
-                        matriz_1[i][j] = matriz[i][j];
-                    }
+            String[][] matriz_2 = new String[N/2][N/2];
+            String[][] matriz_3 = new String[N/2][N/2];
+            String[][] matriz_4 = new String[N/2][N/2];
+            for(int i = 0; i < N/2;i ++){
+                for(int j  = 0; j< N/2;j++){
+                    matriz_1[i][j] = matriz[i][j];
                 }
-                for(int i  = 0; i < N/2; i ++){
-                    for(int j = N/2; j < N; j++){
-                        matriz_2[i][j-(N/2)] = matriz[i][j];
-                    }
+            }
+            for(int i  = 0; i < N/2; i ++){
+                for(int j = N/2; j < N; j++){
+                    matriz_2[i][j-(N/2)] = matriz[i][j];
                 }
-                for(int i = N/2 ; i < N;i++){
-                    for(int j = 0; j <N/2; j++){
-                        matriz_3[i-(N/2)][j] = matriz[i][j];
-                    }
+            }
+            for(int i = N/2 ; i < N;i++){
+                for(int j = 0; j <N/2; j++){
+                    matriz_3[i-(N/2)][j] = matriz[i][j];
                 }
-                for(int i = N/2; i < N; i++){
-                    for(int j = N/2; j < N; j++){
-                        matriz_4[i-(N/2)][j-(N/2)] = matriz[i][j];
-                    }
+            }
+            for(int i = N/2; i < N; i++){
+                for(int j = N/2; j < N; j++){
+                    matriz_4[i-(N/2)][j-(N/2)] = matriz[i][j];
                 }
-                cuadranteForks primer_sector = new cuadranteForks(palabra, relative_x,relative_y,N/2,largo_palabra,matriz_1,tiempo_inicio);
-                cuadranteForks segundo_sector = new cuadranteForks(palabra,relative_x,relative_y+N/2,N/2,largo_palabra,matriz_2,tiempo_inicio); 
-                cuadranteForks tercer_sector = new cuadranteForks(palabra, relative_x + N/2, relative_y, N/2, largo_palabra, matriz_3, tiempo_inicio);
-                cuadranteForks cuarto_sector = new cuadranteForks(palabra, relative_x+N/2, relative_y+N/2, N/2, largo_palabra, matriz_4, tiempo_inicio);
-                
-                primer_sector.fork();
-                segundo_sector.fork();
-                tercer_sector.fork();
-                cuarto_sector.fork();
+            }
+            if (stop.get()) {
+                return 0; 
+            }
+            cuadranteForks primer_sector = new cuadranteForks(palabra, relative_x,relative_y,N/2,largo_palabra,matriz_1,tiempo_inicio);
+            cuadranteForks segundo_sector = new cuadranteForks(palabra,relative_x,relative_y+N/2,N/2,largo_palabra,matriz_2,tiempo_inicio); 
+            cuadranteForks tercer_sector = new cuadranteForks(palabra, relative_x + N/2, relative_y, N/2, largo_palabra, matriz_3, tiempo_inicio);
+            cuadranteForks cuarto_sector = new cuadranteForks(palabra, relative_x+N/2, relative_y+N/2, N/2, largo_palabra, matriz_4, tiempo_inicio);
+            
+            primer_sector.fork();
+            segundo_sector.fork();
+            tercer_sector.fork();
+            cuarto_sector.fork();
 
-                Integer t1 = primer_sector.join();
-                Integer t2 = segundo_sector.join();
-                Integer t3 = tercer_sector.join();
-                Integer t4 = cuarto_sector.join();
-                return t1+t2+t3+t4;
+            Integer t1 = primer_sector.join();
+            Integer t2 = segundo_sector.join();
+            Integer t3 = tercer_sector.join();
+            Integer t4 = cuarto_sector.join();
+            return t1+t2+t3+t4;
 
         }
 

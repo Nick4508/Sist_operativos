@@ -1,4 +1,6 @@
-    public class cuadrante_threads extends Thread{
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class cuadrante_threads extends Thread{
         private String palabra;
         private int relative_x;
         private int relative_y;
@@ -6,6 +8,7 @@
         private int largo_palabra;
         private String[][] matriz;
         private long tiempo_inicio;
+        private static AtomicBoolean detener = new AtomicBoolean(false);
 
         public cuadrante_threads(String palabra, int relative_x,int relative_y,int N, int largo_palabra, String[][] matriz, long tiempo){
             this.N = N;
@@ -28,6 +31,8 @@
                     System.out.printf("Fila : %d, Columna: %d\n" ,relative_x+i, relative_y);
                     long busqueda = tiempo_final-tiempo_inicio;
                     System.out.printf("Se demoró %d milisegundos\n",busqueda);
+                    detener.set(true);
+                    return;
                 }
             }
         }
@@ -42,6 +47,8 @@
                     System.out.printf("Fila : %d, Columna: %d\n" ,relative_x, relative_y + i);
                     long busqueda = tiempo_final-tiempo_inicio;
                     System.out.printf("Se demoró %d milisegundos\n",busqueda);
+                    detener.set(true);
+                    return;
                 }
             }
         }
@@ -51,6 +58,8 @@
                 buscar_horizontal();
                 buscar_vertical();
             }else{
+                if(!detener.get()){
+
                 String[][] matriz_1 = new String[N/2][N/2];
                 String[][] matriz_2 = new String[N/2][N/2];
                 String[][] matriz_3 = new String[N/2][N/2];
@@ -84,12 +93,14 @@
                 segundo_sector.start();
                 tercer_sector.start();
                 cuarto_sector.start();
+                
                 try{
                     primer_sector.join();
                     segundo_sector.join();
                     tercer_sector.join();
                     cuarto_sector.join();
                 }catch(InterruptedException e){
+                }
                     
                 }
             }
