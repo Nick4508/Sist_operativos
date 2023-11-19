@@ -1,6 +1,7 @@
 import threading
 import random as rand
 from datetime import datetime
+import time
 
 rand.seed(39)
 
@@ -44,36 +45,69 @@ claves = {
 
 
 
-class departamentos():
+import threading
+import time
+from datetime import datetime
 
-    def __init__(self,datos, nombre):
+import threading
+from datetime import datetime
+import time
+
+class departamentos:
+
+    def __init__(self, datos, nombre):
         self.max_fila = datos[0]
         self.duracion_consulta = datos[1]
         self.max_dep = datos[2]
         self.semaforo = threading.Semaphore(datos[0])
-        # semaforo con la cantidad maxima de personas por fila para no sobrepasarlas
+        self.dep_ocupado = threading.Semaphore(0)
         self.lock = threading.Lock()
-        # lock para asegurar el entrar bien al departamento correspondiente
         self.nombre = nombre
         self.fila = []
-        self.actual_fila  = 0
-    
-    def entrar_fila(self,persona):
+        self.actual_fila = 0
+
+    def entrar_fila(self, persona):
+        #mando a todas las personas de la fila a la consulta y las saco de la fila
         with self.semaforo:
             self.fila.append(persona)
-            self.actual_fila +=1
+            self.actual_fila += 1
 
-        if self.actual_fila == self.max_dep:
-            tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-            
-            #mandar a los n primeros a self.go_dep
-        return
-    
-    def go_dep(self,personas):
-        return
+            if self.actual_fila == self.max_dep:
+                tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+
+                personas_a_entrar = self.fila[:self.max_dep]
+                self.fila = self.fila[self.max_dep:]
+                self.actual_fila = 0
+
+                self.go_dep(personas_a_entrar)
+
+    def go_dep(self, personas):
+        #toma un semaforo para q este ocupado
+        self.dep_ocupado.acquire()
+        #self lock para q no se interrumpa a la hebra :p
+        with self.lock:
+            print(f"Personas {', '.join([p[2][0] for p in personas])} ingresando a {self.nombre} en {datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
+        #tiempo de consulta
+        time.sleep(self.duracion_consulta)
+
+        with self.lock:
+            print(f"Personas {', '.join([p[2][0] for p in personas])} saliendo de {self.nombre} en {datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
+
+        for persona in personas:
+            if persona[3] == 1:
+                with self.lock:
+                    print(f"{persona[2][0]} se retira de la universidad en {datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
+            else:
+                with self.lock:
+                    persona[3]+=1
+                    print(f"{persona[2][0]} vuelve a Lamparas en {datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
+        #libera el semaforo
+        self.dep_ocupado.release()
 
     def last_call(self):
-        return    
+        return
+
+
 
 
 class lamparas():
@@ -100,12 +134,20 @@ class lamparas():
         for i in self.hilos_personas:
             i.start()
 
+        for i in self.hilos_personas:
+            i.join()
+
         return                
 
     def patio_cola(self,persona):
         self.alumnos.append(persona)
         print(persona[2])
-        return
+        #if persona[3] == 0:
+            # Aqui tenia un codigo para el go_dep pero no me funciono :c xq printeaba lo de arriba y se quedaba en espera infinita xD
+            # si puedes revisar xfa
+        #else:
+            # Segunda :p
+
         
     def patio_cola_2(self):
         return
