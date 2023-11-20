@@ -43,65 +43,80 @@ claves = {
     7 : "dmin"
 }
 
-import threading
-import time
-from datetime import datetime
 
 class departamentos:
 
     def __init__(self, datos, nombre):
-        self.max_fila = datos[0]
-        self.duracion_consulta = datos[1]
-        self.max_dep = datos[2]
-        self.semaforo = threading.Semaphore(datos[0])
-        self.dep_ocupado = threading.Semaphore(1)
-        self.lock = threading.Lock()
+
+        # self.semaforo_fila = threading.Semaphore(datos[0])
+        # self.dep_ocupado = threading.Semaphore(1)
+        # self.semaforo_depto = threading.Semaphore(datos[2])
+        # self.lock = threading.Lock()
+        # self.fila = []
+        # self.actual_fila = 0
+        # self.condicion_grupo = threading.Condition()
+        # self.personas_fila_menor = threading.Condition()
+        # self.personas_en_depto = 0
+
+        ####
         self.nombre = nombre
-        self.fila = []
+        self.max_fila = threading.Semaphore(datos[0])
+        self.max_dep = threading.Semaphore(datos[2])
+        self.condicion = threading.Condition()
+        self.lock = threading.Lock()
         self.actual_fila = 0
-
-    def entrar_fila(self, persona):
-        #mando a todas las personas de la fila a la consulta y las saco de la fila
-        with self.semaforo:
-            self.fila.append(persona)
-            self.actual_fila += 1
-
-            if self.actual_fila == self.max_dep:
-                tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-
-                personas_a_entrar = self.fila[:self.max_dep]
-                for i in personas_a_entrar:
-                    i[0] = f"{i[2][0]},{tiempo}"
-                self.fila = self.fila[self.max_dep:]
-                self.actual_fila = 0
-
-                return self.go_dep(personas_a_entrar)
-            
-
-    def go_dep(self, personas):
-        #toma un semaforo para q este ocupado
-        self.dep_ocupado.acquire()
-        #self lock para q no se interrumpa a la hebra :p
-                
-        #tiempo de consulta
-        time.sleep(self.duracion_consulta)
+        self.depto_ocupado = 0
+        self.tope_dep = datos[2]
+        self.dentro_dep = 0
+        self.consulta = datos[1]
+        ###
+    def entrar_fila(self,persona):
+        time.sleep(0.5)
+        self.max_fila.acquire()
+        self.lock.acquire()
         tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-        with self.lock:
-            with open(f"{self.nombre}.txt","a") as archivo:
-                for i in personas:
-                    archivo.write(f"{i[0]},{tiempo},{i[-1]+1}\n")
+        persona[0] = f"{persona[2][0]},{tiempo},"
+        persona[1] = f"{persona[1]}{nombre_deptos[persona[2][persona[-1]+1]-1]},{tiempo}"
+        self.actual_fila += 1
+        self.lock.release()
+        with self.condicion:
+            if self.actual_fila>= self.tope_dep and self.depto_ocupado == 0:
+                self.condicion.notify()
+        
+        with self.condicion:
+            self.condicion.wait()
 
-        for persona in personas:
-            if persona[3] == 1:
-                with self.lock:
-                    with open("salida.txt","a") as archivo:
-                        archivo.write(f"{persona[2][0]},{tiempo}\n")
-            else:
-                with self.lock:
-                    persona[3]+=1
-        #libera el semaforo
-        self.dep_ocupado.release()
-        return  personas
+        self.depto(persona)
+
+    def depto(self,persona):
+        self.max_dep.acquire()
+        self.lock.acquire()
+        self.actual_fila-=1
+        self.max_fila.release()
+        self.dentro_dep +=1
+        if self.dentro_dep == self.tope_dep:
+            self.depto_ocupado = 1
+        tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+        with open(f"{self.nombre}.txt","a") as archivo:
+            archivo.write(f"{persona[0]}{tiempo},{persona[-1]+1}\n")
+        self.lock.release()
+        time.sleep(self.consulta)
+
+        self.lock.acquire()
+        persona[-1] +=1
+        self.dentro_dep -=1
+        self.lock.release()
+        with self.condicion:
+            if self.dentro_dep == 0:
+                self.depto_ocupado = 0
+                self.condicion.notify_all()
+        self.max_dep.release()
+
+   
+
+        
+
+ 
 
 
     def last_call(self):
@@ -127,20 +142,22 @@ class lamparas():
     def __init__(self):
         self.dmat = departamentos(datos=deptos['dmat'], nombre = nombre_deptos[0])
         self.dinf = departamentos(datos=deptos['dinf'], nombre = nombre_deptos[1])
-        self.dfis = departamentos(datos=deptos['dfis'], nombre = nombre_deptos[1])
-        self.dquim = departamentos(datos=deptos['dquim'], nombre = nombre_deptos[1])
-        self.defider = departamentos(datos=deptos['defider'], nombre = nombre_deptos[1])
-        self.dmec = departamentos(datos=deptos['dmec'], nombre = nombre_deptos[1])
-        self.dmin = departamentos(datos=deptos['dmin'], nombre = nombre_deptos[1])
+        self.dfis = departamentos(datos=deptos['dfis'], nombre = nombre_deptos[2])
+        self.dquim = departamentos(datos=deptos['dquim'], nombre = nombre_deptos[3])
+        self.defider = departamentos(datos=deptos['defider'], nombre = nombre_deptos[4])
+        self.dmec = departamentos(datos=deptos['dmec'], nombre = nombre_deptos[5])
+        self.dmin = departamentos(datos=deptos['dmin'], nombre = nombre_deptos[6])
         self.alumnos = []
+        self.condicion = threading.Condition()
         tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-        self.actual_lamparas = 10
+        self.max_lamp = 100
+        self.actual_lamparas = 0
         self.lock = threading.Lock()
-        for i in range(1,self.actual_lamparas+1):
-            a = rand.randint(1,2)
-            b = rand.randint(1,2)
+        for i in range(1,self.max_lamp+1):
+            a = rand.randint(1,7)
+            b = rand.randint(1,7)
             while(a == b):
-                b = rand.randint(1,2)
+                b = rand.randint(1,7)
             sample = ["",f"Persona{i},{tiempo }," ,("Persona{}".format(i),a,b),0] # 
             # string para escribir en deptos, string para escribir en patio lamparas,( persona_numero, depto_1, depto_2 ),[ instancia de depto 0 si es el primero, 1 si es el 2do] 
             hilo = threading.Thread(target=self.patio_cola,args=(sample,))
@@ -171,6 +188,7 @@ class lamparas():
         # tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
         # persona[1] = f"{persona[1]}{nombre_deptos[int(persona[2][1]-1)]},{tiempo}"        
         # self.hilos_2personas.append(persona)
+        # print(persona[2])
         if persona[2][1] == 1:
             self.dmat.entrar_fila(persona)
             self.lock.acquire()
@@ -181,10 +199,45 @@ class lamparas():
             self.lock.acquire()
             self.actual_lamparas -= 1
             self.lock.release()
+        elif persona[2][1] == 3:
+            self.dfis.entrar_fila(persona)
+            self.lock.acquire()
+            self.actual_lamparas -= 1
+            self.lock.release()
+        elif persona[2][1] == 4:
+            self.dquim.entrar_fila(persona)
+            self.lock.acquire()
+            self.actual_lamparas -= 1
+            self.lock.release()
+        elif persona[2][1] == 5:
+            self.defider.entrar_fila(persona)
+            self.lock.acquire()
+            self.actual_lamparas -= 1
+            self.lock.release()
+        elif persona[2][1] == 6:
+            self.dmec.entrar_fila(persona)
+            self.lock.acquire()
+            self.actual_lamparas -= 1
+            self.lock.release()
+        elif persona[2][1] == 7:
+            self.dmin.entrar_fila(persona)
+            self.lock.acquire()
+            self.actual_lamparas -= 1
+            self.lock.release()
+        # if self.actual_lamparas == 0:
+            # self.last_call()
+            # self.deptos_2()
 
-        if self.actual_lamparas == 0:
-            self.last_call()
-            self.deptos_2()
+        ### Notificar para que se ejecute la 2da vuelta solo que hay que enviar la ultima señal para que 
+        ### pasen a realizar la consulta
+        with self.lock:
+            self.actual_lamparas +=1
+        with self.condicion:
+            if self.actual_lamparas == self.max_lamp:
+                self.condicion.notify_all()
+            else:
+                self.condicion.wait()
+        self.patio_cola_2(persona)
     
     def deptos_2(self):
         for i in self.hilos_2personas:
@@ -216,4 +269,3 @@ class lamparas():
 archivos(nombre_deptos)
 lampara = lamparas()
 lampara.ready()
-print(lampara.alumnos)
