@@ -47,18 +47,6 @@ claves = {
 class departamentos:
 
     def __init__(self, datos, nombre):
-
-        # self.semaforo_fila = threading.Semaphore(datos[0])
-        # self.dep_ocupado = threading.Semaphore(1)
-        # self.semaforo_depto = threading.Semaphore(datos[2])
-        # self.lock = threading.Lock()
-        # self.fila = []
-        # self.actual_fila = 0
-        # self.condicion_grupo = threading.Condition()
-        # self.personas_fila_menor = threading.Condition()
-        # self.personas_en_depto = 0
-
-        ####
         self.nombre = nombre
         self.max_fila = threading.Semaphore(datos[0])
         self.max_dep = threading.Semaphore(datos[2])
@@ -70,13 +58,13 @@ class departamentos:
         self.dentro_dep = 0
         self.consulta = datos[1]
         ###
+
     def entrar_fila(self,persona):
         time.sleep(0.5)
         self.max_fila.acquire()
         self.lock.acquire()
         tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
         persona[0] = f"{persona[2][0]},{tiempo},"
-        persona[1] = f"{persona[1]}{nombre_deptos[persona[2][persona[-1]+1]-1]},{tiempo}"
         self.actual_fila += 1
         self.lock.release()
         with self.condicion:
@@ -112,32 +100,17 @@ class departamentos:
                 self.condicion.notify_all()
         self.max_dep.release()
 
-   
-
-        
-
- 
-
 
     def last_call(self):
-        tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+        with self.condicion:
+            self.condicion.notify_all()
 
-        personas_a_entrar = self.fila[:self.max_dep]
-        for i in personas_a_entrar:
-            i[0] = f"{i[2][0]},{tiempo}"
-        self.fila = self.fila[self.max_dep:]
-        self.actual_fila = 0
-
-        return self.go_dep(personas_a_entrar)
-        return
 
 
 
 
 class lamparas():
     hilos_personas = []
-    hilos_2personas = []
-
 
     def __init__(self):
         self.dmat = departamentos(datos=deptos['dmat'], nombre = nombre_deptos[0])
@@ -150,7 +123,7 @@ class lamparas():
         self.alumnos = []
         self.condicion = threading.Condition()
         tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-        self.max_lamp = 100
+        self.max_lamp = 500
         self.actual_lamparas = 0
         self.lock = threading.Lock()
         for i in range(1,self.max_lamp+1):
@@ -173,22 +146,14 @@ class lamparas():
 
         return                
     
-    def last_call(self):
-        self.dmat.go_dep(self.dmat.last_call())
-        self.dinf.go_dep(self.dinf.last_call())
-        self.dfis.go_dep(self.dfis.last_call())
-        self.dquim.go_dep(self.dquim.last_call())
-        self.dmec.go_dep(self.dmec.last_call())
-        self.defider.go_dep(self.defider.last_call())
-        self.dmin.go_dep(self.dmin.last_call())
 
 # sample = ["",f"Persona{i},{tiempo }," ,("Persona{}".format(i),a,b),0] # 
     def patio_cola(self,persona):
         self.alumnos.append(persona)
-        # tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-        # persona[1] = f"{persona[1]}{nombre_deptos[int(persona[2][1]-1)]},{tiempo}"        
-        # self.hilos_2personas.append(persona)
-        # print(persona[2])
+        tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+        self.lock.acquire()
+        persona[1] = f"{persona[1]}{nombre_deptos[int(persona[2][1]-1)]},{tiempo},"        
+        self.lock.release()
         if persona[2][1] == 1:
             self.dmat.entrar_fila(persona)
             self.lock.acquire()
@@ -224,30 +189,17 @@ class lamparas():
             self.lock.acquire()
             self.actual_lamparas -= 1
             self.lock.release()
-        # if self.actual_lamparas == 0:
-            # self.last_call()
-            # self.deptos_2()
-
-        ### Notificar para que se ejecute la 2da vuelta solo que hay que enviar la ultima señal para que 
-        ### pasen a realizar la consulta
-        with self.lock:
-            self.actual_lamparas +=1
-        with self.condicion:
-            if self.actual_lamparas == self.max_lamp:
-                self.condicion.notify_all()
-            else:
-                self.condicion.wait()
         self.patio_cola_2(persona)
     
-    def deptos_2(self):
-        for i in self.hilos_2personas:
-            self.patio_cola_2(i)
+
         
     def patio_cola_2(self,persona):
-        # tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-        # persona[1] = f"{persona[1]}{nombre_deptos[int(persona[2][2]-1)]},{tiempo},"        
-        # with open("PdLamparas.txt","a") as archivo:
-        #     archivo.write(f"{persona[1]}\n")
+        tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+        self.lock.acquire()
+        persona[1] = f"{persona[1]}{nombre_deptos[int(persona[2][2]-1)]},{tiempo}"        
+        with open("PdLamparas.txt","a") as archivo:
+            archivo.write(f"{persona[1]}\n")
+        self.lock.release()
         if persona[2][2] == 1:
             self.dmat.entrar_fila(persona)
             self.lock.acquire()
@@ -258,13 +210,49 @@ class lamparas():
             self.lock.acquire()
             self.actual_lamparas -= 1
             self.lock.release()
-        # if self.actual_lamparas == 0:
-        #     self.last_call()
-           
+        elif persona[2][2] == 3:
+            self.dfis.entrar_fila(persona)
+            self.lock.acquire()
+            self.actual_lamparas -= 1
+            self.lock.release()
+        elif persona[2][2] == 4:
+            self.dquim.entrar_fila(persona)
+            self.lock.acquire()
+            self.actual_lamparas -= 1
+            self.lock.release()
+        elif persona[2][2] == 5:
+            self.defider.entrar_fila(persona)
+            self.lock.acquire()
+            self.actual_lamparas -= 1
+            self.lock.release()
+        elif persona[2][2] == 6:
+            self.dmec.entrar_fila(persona)
+            self.lock.acquire()
+            self.actual_lamparas -= 1
+            self.lock.release()
+        elif persona[2][2] == 7:
+            self.dmin.entrar_fila(persona)
+            self.lock.acquire()
+            self.actual_lamparas -= 1
+            self.lock.release()
+        
+        tiempo = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+        self.lock.acquire()
+        with open("Salida.txt","a") as archivo:
+            archivo.write(f"{persona[2][0]},{tiempo}\n")
+        self.alumnos.pop()
+        self.lock.release()
+        if len(self.alumnos) < 10:
+            self.defider.last_call()
+            self.dfis.last_call()
+            self.dmat.last_call()
+            self.dinf.last_call()
+            self.dmin.last_call()
+            self.dquim.last_call()
+            self.dmec.last_call()
+
+
             
-
-    # def patio(self):
-
 
 archivos(nombre_deptos)
 lampara = lamparas()
